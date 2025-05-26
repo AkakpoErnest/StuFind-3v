@@ -27,14 +27,13 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { StufindLogo } from "@/components/stufind-logo"
 import { PriceDisplayComponent } from "@/components/price-display"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { SearchBar } from "@/components/search-bar"
 import { TeamProfiles } from "@/components/team-profiles"
 import { UniversityShowcase } from "@/components/university-showcase"
 import { StufindTokens } from "@/components/stufind-tokens"
 import { ProductDetailModal } from "@/components/product-detail-modal"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { AuthModal } from "@/components/auth/auth-modal"
 import { useAuth } from "@/components/auth/auth-provider"
 
@@ -197,71 +196,22 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <StufindLogo size={32} showText />
-              <Badge
-                variant="outline"
-                className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 dark:from-blue-950 dark:to-purple-950"
-              >
-                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
-                Base Network
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" asChild>
-                <Link href="/marketplace">Marketplace</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/used-products">Used Products</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/jobs">Jobs</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/donate">Donate</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/verify">Verify</Link>
-              </Button>
-              <Button variant="ghost" onClick={() => setShowTokens(!showTokens)} className="flex items-center gap-2">
-                <Coins className="h-4 w-4 text-yellow-500" />
-                <span className="font-semibold">1,250</span>
-              </Button>
-              <ThemeToggle />
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm">Welcome, {user?.firstName || user?.walletAddress?.slice(0, 6)}</span>
-                  <Button variant="outline" onClick={signOut}>
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <Button className="bg-gradient-to-r from-green-500 to-blue-600" onClick={() => setShowAuthModal(true)}>
-                  Get Started
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Token Panel */}
-      {showTokens && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="border-b bg-muted/50 p-4"
-        >
-          <div className="container mx-auto">
-            <StufindTokens />
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {showTokens && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="border-b bg-muted/50 p-4"
+          >
+            <div className="container mx-auto">
+              <StufindTokens />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 py-20 relative overflow-hidden">
@@ -855,6 +805,38 @@ export default function HomePage() {
           }
         }}
       />
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+        <AnimatePresence>
+          {!isAuthenticated && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.3, type: "spring" }}
+            >
+              <Button
+                onClick={() => setShowAuthModal(true)}
+                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-3"
+              >
+                Get Started
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            variant="outline"
+            onClick={() => setShowTokens(!showTokens)}
+            className="flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full bg-background/80 backdrop-blur-sm"
+          >
+            <Coins className="h-4 w-4 text-yellow-500" />
+            <span className="font-semibold">1,250</span>
+          </Button>
+        </motion.div>
+      </div>
     </div>
   )
 }

@@ -24,8 +24,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <AuthProvider>
-            <Navigation />
-            {children}
+            <div className="min-h-screen bg-background">
+              <Navigation />
+              <main className="transition-all duration-300 ease-in-out">{children}</main>
+            </div>
           </AuthProvider>
         </ThemeProvider>
       </body>
