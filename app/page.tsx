@@ -35,6 +35,8 @@ import { StufindTokens } from "@/components/stufind-tokens"
 import { ProductDetailModal } from "@/components/product-detail-modal"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { AuthModal } from "@/components/auth/auth-modal"
+import { useAuth } from "@/components/auth/auth-provider"
 
 const categories = [
   { name: "Textbooks", icon: BookOpen, count: 234, color: "from-blue-500 to-blue-600" },
@@ -171,6 +173,8 @@ export default function HomePage() {
   const [searchResults, setSearchResults] = useState(featuredProducts)
   const [selectedProduct, setSelectedProduct] = useState<any>(null)
   const [showTokens, setShowTokens] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const { user, signOut, isAuthenticated } = useAuth()
 
   const handleSearch = (query: string) => {
     if (!query) {
@@ -228,7 +232,18 @@ export default function HomePage() {
                 <span className="font-semibold">1,250</span>
               </Button>
               <ThemeToggle />
-              <Button className="bg-gradient-to-r from-green-500 to-blue-600">Get Started</Button>
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm">Welcome, {user?.firstName || user?.walletAddress?.slice(0, 6)}</span>
+                  <Button variant="outline" onClick={signOut}>
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Button className="bg-gradient-to-r from-green-500 to-blue-600" onClick={() => setShowAuthModal(true)}>
+                  Get Started
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -827,6 +842,19 @@ export default function HomePage() {
           onClose={() => setSelectedProduct(null)}
         />
       )}
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={(user) => {
+          setShowAuthModal(false)
+          // Redirect to verification if not verified
+          if (!user.isVerified) {
+            window.location.href = "/verify"
+          }
+        }}
+      />
     </div>
   )
 }
