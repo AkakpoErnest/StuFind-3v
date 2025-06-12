@@ -82,7 +82,7 @@ export function Navigation() {
         <div className="flex items-center justify-between">
           {/* Left Section */}
           <div className="flex items-center space-x-3">
-            {/* Back Button (ArrowLeft) - Visible on all non-home pages */}
+            {/* Back Button (ArrowLeft) - Visible on all non-home pages, all screen sizes */}
             <AnimatePresence>
               {!isHomePage && (
                 <motion.div
@@ -96,7 +96,7 @@ export function Navigation() {
                     size="icon"
                     onClick={handleBack}
                     className="hover:bg-primary/10 transition-colors duration-200"
-                    aria-label="Go back to previous page" // More descriptive label
+                    aria-label="Go back to previous page"
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
@@ -148,11 +148,9 @@ export function Navigation() {
 
           {/* Right Section */}
           <div className="flex items-center space-x-2">
-            {/* Home Button (House icon) - Now always visible on non-home pages */}
+            {/* Home Button (House icon) - Now always visible on non-home pages, all screen sizes */}
             {!isHomePage && (
               <Button variant="ghost" size="icon" asChild aria-label="Go to Home page">
-                {" "}
-                {/* Removed hidden sm:flex */}
                 <Link href="/">
                   <Home className="h-5 w-5" />
                 </Link>
@@ -180,12 +178,12 @@ export function Navigation() {
 
             <ThemeToggle />
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button (Hamburger/X icon) - Visible only on mobile */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden"
+              className="lg:hidden" // This button is specifically for mobile
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -193,7 +191,7 @@ export function Navigation() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu (Collapsible) */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div

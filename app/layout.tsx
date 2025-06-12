@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/auth/auth-provider"
+import { Navigation } from "@/components/navigation" // IMPORTANT: This imports the Navigation component
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,7 +25,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <Navigation /> {/* IMPORTANT: This renders the Navigation component at the top of every page */}
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
