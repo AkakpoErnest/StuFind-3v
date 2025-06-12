@@ -1,14 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
 
-const sql = neon(process.env.NEON_NEON_NEON_DATABASE_URL!)
+let sqlInstance: ReturnType<typeof neon> | null = null
+
+function getSqlClient() {
+  if (!sqlInstance) {
+    const databaseUrl = process.env.NEON_NEON_DATABASE_URL // Standardized variable name
+    if (!databaseUrl) {
+      throw new Error("Database connection string (NEON_DATABASE_URL) is not set.")
+    }
+    sqlInstance = neon(databaseUrl)
+  }
+  return sqlInstance
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const sql = getSqlClient()
     const data = await request.json()
     const { userId, firstName, lastName, idNumber, university, phoneNumber, verificationMethod, isStudent } = data
 
-    // Update user verification status
     await sql`
       UPDATE users 
       SET 
@@ -23,7 +34,6 @@ export async function POST(request: NextRequest) {
       WHERE id = ${userId}
     `
 
-    // Track verification for algorithm
     await sql`
       INSERT INTO user_activities (user_id, action, metadata, created_at)
       VALUES (${userId}, 'verification_completed', ${JSON.stringify({ method: verificationMethod })}, NOW())

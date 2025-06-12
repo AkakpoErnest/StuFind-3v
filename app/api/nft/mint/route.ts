@@ -1,13 +1,24 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
 
-const sql = neon(process.env.NEON_NEON_NEON_DATABASE_URL!)
+let sqlInstance: ReturnType<typeof neon> | null = null
+
+function getSqlClient() {
+  if (!sqlInstance) {
+    const databaseUrl = process.env.NEON_NEON_DATABASE_URL // Standardized variable name
+    if (!databaseUrl) {
+      throw new Error("Database connection string (NEON_DATABASE_URL) is not set.")
+    }
+    sqlInstance = neon(databaseUrl)
+  }
+  return sqlInstance
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const sql = getSqlClient()
     const { userId } = await request.json()
 
-    // Simulate NFT minting (in real implementation, this would interact with smart contract)
     const tokenId = `STU_${Date.now()}_${userId}`
 
     await sql`
