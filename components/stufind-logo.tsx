@@ -1,5 +1,7 @@
 "use client"
 
+import { Compass } from "lucide-react" // Importing the Compass icon
+
 interface StufindLogoProps {
   size?: number
   showText?: boolean
@@ -12,11 +14,11 @@ export function StufindLogo({ size = 32, showText = false, className = "" }: Stu
       <div
         className={`w-${size} h-${size} bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center shadow-lg`}
       >
-        <span className="text-white font-bold text-xl">S</span>
+        <Compass className="text-white" size={size * 0.6} /> {/* Using Compass icon */}
       </div>
       {showText && (
         <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-          Stufind
+          StuFind {/* Corrected spelling */}
         </span>
       )}
     </div>

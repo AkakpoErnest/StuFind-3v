@@ -18,6 +18,7 @@ import {
   Eye,
   MapPin,
   Clock,
+  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -37,6 +38,7 @@ const categories = [
   { name: "Dorm Items", value: "dorm", icon: Home },
   { name: "Food & Drinks", value: "food", icon: Coffee },
   { name: "Gaming", value: "gaming", icon: Gamepad2 },
+  { name: "Anime & Manga", value: "anime", icon: Sparkles }, // Added Anime & Manga category
 ]
 
 const allProducts = [
@@ -199,6 +201,67 @@ const allProducts = [
     rating: 4.6,
     totalSales: 4,
     likes: 23,
+  },
+  // New Anime Products
+  {
+    id: 9,
+    title: "Attack on Titan Manga Set (Vol 1-10)",
+    priceUSD: 75,
+    image: "/placeholder.svg?height=400&width=300", // Placeholder image for manga
+    seller: "Kojo A.",
+    condition: "Like New",
+    category: "anime",
+    tokenId: "1009",
+    verified: true,
+    university: "Ho Technical University",
+    description: "First 10 volumes of the Attack on Titan manga series. Read once, in perfect condition.",
+    features: ["Original Japanese", "English translation", "Collector's edition", "No missing pages"],
+    timePosted: "1 day ago",
+    views: 50,
+    location: "HTU Campus",
+    rating: 4.9,
+    totalSales: 7,
+    likes: 30,
+  },
+  {
+    id: 10,
+    title: "My Hero Academia Action Figure - Deku",
+    priceUSD: 30,
+    image: "/placeholder.svg?height=400&width=300", // Placeholder image for action figure
+    seller: "Nana Y.",
+    condition: "Excellent",
+    category: "anime",
+    tokenId: "1010",
+    verified: false,
+    university: "University of Ghana",
+    description: "Authentic Izuku Midoriya (Deku) action figure. Still in original packaging.",
+    features: ["Official merchandise", "Poseable joints", "Collector's item", "Original box"],
+    timePosted: "3 days ago",
+    views: 28,
+    location: "Legon Campus",
+    rating: 4.7,
+    totalSales: 2,
+    likes: 18,
+  },
+  {
+    id: 11,
+    title: "Demon Slayer Nezuko Cosplay Wig",
+    priceUSD: 40,
+    image: "/placeholder.svg?height=400&width=300", // Placeholder image for wig
+    seller: "Adwoa B.",
+    condition: "New",
+    category: "anime",
+    tokenId: "1011",
+    verified: true,
+    university: "KNUST",
+    description: "High-quality Nezuko Kamado cosplay wig. Never worn, perfect for conventions.",
+    features: ["Heat resistant fiber", "Adjustable cap", "Realistic look", "Includes hairnet"],
+    timePosted: "6 hours ago",
+    views: 15,
+    location: "Kumasi Campus",
+    rating: 4.8,
+    totalSales: 1,
+    likes: 10,
   },
 ]
 

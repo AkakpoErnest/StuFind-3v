@@ -15,21 +15,29 @@ export interface PriceDisplay {
   }
 }
 
-// Mock exchange rates - in production, fetch from API
+// Now fetches from our own API route, which in turn fetches from CoinGecko
 export const getCurrentRates = async (): Promise<CurrencyRate> => {
   try {
-    // In production, use real API like CoinGecko or exchangerate-api.com
-    const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd,ghs")
-    const data = await response.json()
+    // Fetch from our own API route
+    const response = await fetch("/api/currency-rates", { cache: "no-store" }) // Use no-store to ensure fresh data
 
-    return {
-      usd: 1,
-      ghs: data.ethereum?.ghs || 12.5, // Fallback rate
-      eth: data.ethereum?.usd || 1800,
+    if (!response.ok) {
+      // If our API route returns an error, log it and return fallback
+      const errorData = await response.json() // Assuming our API route returns JSON on error
+      console.error(`Our currency API error: ${response.status} - ${errorData.message || "Unknown error"}`)
+      // Fallback rates if our API route fails
+      return {
+        usd: 1,
+        ghs: 12.5,
+        eth: 1800,
+      }
     }
+
+    const data = await response.json()
+    return data // This will be the CurrencyRate object
   } catch (error) {
-    console.error("Error fetching rates:", error)
-    // Fallback rates
+    console.error("Error fetching rates from our internal API:", error)
+    // Fallback rates if the fetch to our internal API fails
     return {
       usd: 1,
       ghs: 12.5, // 1 USD = 12.5 GHS (approximate)

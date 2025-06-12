@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Clock, MapPin, User, CheckCircle, AlertCircle } from "lucide-react"
+import { Clock, MapPin, User, CheckCircle, AlertCircle } from "lucide-react" // Added Sparkles icon
 import { PageWrapper } from "@/components/page-wrapper"
 import { PriceDisplayComponent } from "@/components/price-display"
 import { ProductDetailModal } from "@/components/product-detail-modal"
@@ -117,6 +117,43 @@ const usedProducts = [
     verified: true,
     urgent: false,
     items: ["Drawing tablets", "Paint sets", "Brushes", "Sketchbooks", "Design software"],
+  },
+  // New Used Anime Products
+  {
+    id: 7,
+    title: "One Piece Manga Box Set 1",
+    description: "First box set of the One Piece manga. Great condition, perfect for new fans!",
+    priceUSD: 90,
+    originalPrice: 180,
+    image: "/placeholder.svg?height=400&width=300", // Placeholder image
+    seller: "Joe Emmanuel",
+    condition: "Good",
+    category: "Anime & Manga",
+    university: "Ho Technical University",
+    graduationDate: "June 2024",
+    reason: "Upgrading to digital collection",
+    timePosted: "1 week ago",
+    verified: true,
+    urgent: false,
+    items: ["Volumes 1-23", "Exclusive poster", "Box in good condition"],
+  },
+  {
+    id: 8,
+    title: "Naruto Shippuden DVD Set (Seasons 1-5)",
+    description: "Original DVD set for Naruto Shippuden. All discs working, some minor scratches on cases.",
+    priceUSD: 50,
+    originalPrice: 150,
+    image: "/placeholder.svg?height=400&width=300", // Placeholder image
+    seller: "Su Augusta",
+    condition: "Fair",
+    category: "Anime & Manga",
+    university: "University of Ghana",
+    graduationDate: "July 2024",
+    reason: "Streaming now",
+    timePosted: "3 days ago",
+    verified: true,
+    urgent: true,
+    items: ["Season 1 DVD", "Season 2 DVD", "Season 3 DVD", "Season 4 DVD", "Season 5 DVD"],
   },
 ]
 

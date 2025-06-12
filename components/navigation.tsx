@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter, usePathname } from "next/navigation"
-import { ArrowLeft, Home, User, Menu, X, Coins } from "lucide-react"
+import { ArrowLeft, Home, User, Menu, X, Coins, Bot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { StufindLogo } from "@/components/stufind-logo"
 import { Badge } from "@/components/ui/badge"
@@ -53,6 +53,8 @@ export function Navigation() {
         return "Wallet"
       case "/profile":
         return "Profile"
+      case "/post-job":
+        return "Post a Job"
       default:
         return "Stufind"
     }
@@ -66,6 +68,7 @@ export function Navigation() {
     { href: "/jobs", label: "Jobs" },
     { href: "/donate", label: "Donate" },
     { href: "/verify", label: "Verify" },
+    { href: "/whatsapp-ai", label: "WhatsApp AI" },
   ]
 
   return (
@@ -79,7 +82,7 @@ export function Navigation() {
         <div className="flex items-center justify-between">
           {/* Left Section */}
           <div className="flex items-center space-x-3">
-            {/* Back Button */}
+            {/* Back Button (ArrowLeft) - Visible on all non-home pages */}
             <AnimatePresence>
               {!isHomePage && (
                 <motion.div
@@ -93,7 +96,7 @@ export function Navigation() {
                     size="icon"
                     onClick={handleBack}
                     className="hover:bg-primary/10 transition-colors duration-200"
-                    aria-label="Go back"
+                    aria-label="Go back to previous page" // More descriptive label
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
@@ -101,10 +104,10 @@ export function Navigation() {
               )}
             </AnimatePresence>
 
-            {/* Logo */}
+            {/* Logo - Always links to Home */}
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <StufindLogo size={32} />
-              <span className="text-xl font-bold text-primary hidden sm:block">Stufind</span>
+              <span className="text-xl font-bold text-primary hidden sm:block">StuFind</span>
             </Link>
 
             {/* Page Title */}
@@ -135,16 +138,21 @@ export function Navigation() {
                 asChild
                 className="transition-all duration-200"
               >
-                <Link href={item.href}>{item.label}</Link>
+                <Link href={item.href}>
+                  {item.label === "WhatsApp AI" ? <Bot className="h-4 w-4 mr-1" /> : null}
+                  {item.label}
+                </Link>
               </Button>
             ))}
           </div>
 
           {/* Right Section */}
           <div className="flex items-center space-x-2">
-            {/* Home Button (only on non-home pages) */}
+            {/* Home Button (House icon) - Now always visible on non-home pages */}
             {!isHomePage && (
-              <Button variant="ghost" size="icon" asChild className="hidden sm:flex" aria-label="Go to Home">
+              <Button variant="ghost" size="icon" asChild aria-label="Go to Home page">
+                {" "}
+                {/* Removed hidden sm:flex */}
                 <Link href="/">
                   <Home className="h-5 w-5" />
                 </Link>
@@ -204,7 +212,10 @@ export function Navigation() {
                     className="justify-start"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Link href={item.href}>{item.label}</Link>
+                    <Link href={item.href}>
+                      {item.label === "WhatsApp AI" ? <Bot className="h-4 w-4 mr-2" /> : null}
+                      {item.label}
+                    </Link>
                   </Button>
                 ))}
 
