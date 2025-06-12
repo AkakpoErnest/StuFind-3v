@@ -1,290 +1,246 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
-
 import { useState } from "react"
-import Image from "next/image"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { SearchBar } from "@/components/search-bar"
+import { Clock, MapPin, User, CheckCircle, AlertCircle } from "lucide-react" // Added Sparkles icon
+import { PageWrapper } from "@/components/page-wrapper"
+import { PriceDisplayComponent } from "@/components/price-display"
 import { ProductDetailModal } from "@/components/product-detail-modal"
-import { PriceDisplay } from "@/components/price-display" // Corrected import name
-import { motion } from "framer-motion"
-import { MapPin, Clock, Heart, MessageCircle, PlusCircle } from "lucide-react"
-import Link from "next/link"
 
-interface Product {
-  id: string
-  name: string
-  price: number
-  currency: string
-  imageUrl: string
-  category: string
-  condition: string
-  location: string
-  postedAgo: string
-  description: string
-}
-
-const allUsedProducts: Product[] = [
+const usedProducts = [
   {
-    id: "u1",
-    name: "Old Physics Textbook",
-    price: 80,
-    currency: "GHS",
-    imageUrl: "/images/products/calculus-textbook.jpg",
+    id: 1,
+    title: "Complete Engineering Textbook Set",
+    description: "All my mechanical engineering textbooks from 4 years. Perfect for incoming students!",
+    priceUSD: 120,
+    originalPrice: 450,
+    image: "/images/products/engineering-books.jpg",
+    seller: "Kwame Asante",
+    condition: "Good",
     category: "Textbooks",
-    condition: "Used - Fair",
-    location: "HTU Campus",
-    postedAgo: "1 day ago",
-    description: "Physics textbook, 6th edition. Well-used with notes and highlights. Still very readable.",
+    university: "Ho Technical University",
+    graduationDate: "June 2024",
+    reason: "Graduating - no longer needed",
+    timePosted: "2 days ago",
+    verified: true,
+    urgent: true,
+    items: ["Thermodynamics", "Fluid Mechanics", "Materials Science", "Machine Design", "+8 more"],
   },
   {
-    id: "u2",
-    name: "Used Mini Fridge",
-    price: 300,
-    currency: "GHS",
-    imageUrl: "/images/products/mini-fridge.jpg",
-    category: "Dorm Essentials",
-    condition: "Used - Good",
-    location: "Accra Hostel",
-    postedAgo: "4 days ago",
-    description: "Reliable mini fridge, perfect for drinks and snacks. Minor scratches, works perfectly.",
+    id: 2,
+    title: "Dorm Room Complete Setup",
+    description: "Everything you need for your dorm: fridge, desk lamp, bedding, storage boxes, and more!",
+    priceUSD: 200,
+    originalPrice: 600,
+    image: "/images/products/dorm-setup.jpg",
+    seller: "Ama Osei",
+    condition: "Excellent",
+    category: "Dorm Bundle",
+    university: "University of Ghana",
+    graduationDate: "July 2024",
+    reason: "Moving abroad for masters",
+    timePosted: "1 day ago",
+    verified: true,
+    urgent: true,
+    items: ["Mini fridge", "Study desk", "Bedding set", "Storage boxes", "Desk lamp"],
   },
   {
-    id: "u3",
-    name: "Pre-loved Lab Coat",
-    price: 60,
-    currency: "GHS",
-    imageUrl: "/images/products/lab-coat.jpg",
-    category: "Apparel",
-    condition: "Used - Good",
-    location: "KNUST Science Dept",
-    postedAgo: "2 days ago",
-    description: "Cleaned lab coat, size L. Ready for your lab sessions.",
-  },
-  {
-    id: "u4",
-    name: "Vintage Gaming Console",
-    price: 500,
-    currency: "GHS",
-    imageUrl: "/images/products/nintendo-switch.jpg",
+    id: 3,
+    title: "MacBook Pro + Accessories Bundle",
+    description: "My trusty laptop that got me through computer science degree. Includes charger, mouse, and bag.",
+    priceUSD: 800,
+    originalPrice: 1200,
+    image: "/images/products/macbook-pro.jpg",
+    seller: "Ernest Akakpo",
+    condition: "Good",
     category: "Electronics",
-    condition: "Used - Fair",
-    location: "Legon Campus",
-    postedAgo: "1 week ago",
-    description: "Classic gaming console, comes with one controller. Some cosmetic wear, but functional.",
+    university: "Ho Technical University",
+    graduationDate: "June 2024",
+    reason: "Got new laptop for job",
+    timePosted: "3 hours ago",
+    verified: true,
+    urgent: false,
+    items: ["MacBook Pro 2020", "Original charger", "Wireless mouse", "Laptop bag", "Screen protector"],
   },
   {
-    id: "u5",
-    name: "Old Chemistry Set",
-    price: 100,
-    currency: "GHS",
-    imageUrl: "/images/products/chemistry-textbook.jpg",
-    category: "Other",
-    condition: "Used - Good",
-    location: "UCC Campus",
-    postedAgo: "3 days ago",
-    description: "Basic chemistry set for experiments. Missing a few items, but most are present.",
-  },
-  {
-    id: "u6",
-    name: "Worn Engineering Textbooks",
-    price: 250,
-    currency: "GHS",
-    imageUrl: "/images/products/engineering-books.jpg",
+    id: 4,
+    title: "Business Administration Books & Notes",
+    description: "Complete set of business books plus my handwritten notes. Great for BBA students!",
+    priceUSD: 80,
+    originalPrice: 300,
+    image: "/images/products/business-books.jpg",
+    seller: "Akosua Mensah",
+    condition: "Like New",
     category: "Textbooks",
-    condition: "Used - Fair",
-    location: "Takoradi Technical Uni",
-    postedAgo: "2 weeks ago",
-    description: "Set of engineering textbooks, well-worn but content is intact. Great for reference.",
+    university: "GIMPA",
+    graduationDate: "August 2024",
+    reason: "Completed degree",
+    timePosted: "1 week ago",
+    verified: true,
+    urgent: false,
+    items: ["Marketing Management", "Financial Accounting", "Business Law", "Economics", "Personal notes"],
   },
   {
-    id: "u7",
-    name: "Second-hand Dorm Furniture",
-    price: 600,
-    currency: "GHS",
-    imageUrl: "/images/products/dorm-setup.jpg",
-    category: "Dorm Essentials",
-    condition: "Used - Good",
-    location: "Central University",
-    postedAgo: "5 days ago",
-    description: "Used desk and chair set, perfect for a student dorm. Minor scratches.",
+    id: 5,
+    title: "Lab Equipment & Supplies",
+    description: "Chemistry lab equipment and supplies. Perfect for science students starting lab work.",
+    priceUSD: 60,
+    originalPrice: 180,
+    image: "/images/products/lab-equipment.jpg",
+    seller: "Yaw Boateng",
+    condition: "Good",
+    category: "Lab Equipment",
+    university: "KNUST",
+    graduationDate: "May 2024",
+    reason: "Switching to industry",
+    timePosted: "4 days ago",
+    verified: false,
+    urgent: true,
+    items: ["Lab coat", "Safety goggles", "Beakers set", "Measuring tools", "Lab notebook"],
   },
   {
-    id: "u8",
-    name: "Pre-owned MacBook Pro",
-    price: 4500,
-    currency: "GHS",
-    imageUrl: "/images/products/macbook-pro.jpg",
-    category: "Electronics",
-    condition: "Used - Good",
-    location: "GIMPA",
-    postedAgo: "1 month ago",
-    description: "MacBook Pro 2017, 8GB RAM, 256GB SSD. Good working condition, some signs of use.",
+    id: 6,
+    title: "Art & Design Complete Kit",
+    description: "Professional art supplies and design tools. Everything needed for art and design courses.",
+    priceUSD: 150,
+    originalPrice: 400,
+    image: "/images/products/art-supplies.jpg",
+    seller: "Efua Larbi",
+    condition: "Excellent",
+    category: "Art Supplies",
+    university: "University of Cape Coast",
+    graduationDate: "July 2024",
+    reason: "Moving to digital art",
+    timePosted: "5 days ago",
+    verified: true,
+    urgent: false,
+    items: ["Drawing tablets", "Paint sets", "Brushes", "Sketchbooks", "Design software"],
   },
+  // New Used Anime Products
   {
-    id: "u9",
-    name: "Used Business Books",
-    price: 150,
-    currency: "GHS",
-    imageUrl: "/images/products/business-books.jpg",
-    category: "Textbooks",
-    condition: "Used - Good",
-    location: "Accra Technical Uni",
-    postedAgo: "1 week ago",
-    description: "Collection of business books, various topics. Good for introductory courses.",
-  },
-  {
-    id: "u10",
-    name: "Anime Manga Collection",
-    price: 280,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
+    id: 7,
+    title: "One Piece Manga Box Set 1",
+    description: "First box set of the One Piece manga. Great condition, perfect for new fans!",
+    priceUSD: 90,
+    originalPrice: 180,
+    image: "/placeholder.svg?height=400&width=300", // Placeholder image
+    seller: "Joe Emmanuel",
+    condition: "Good",
     category: "Anime & Manga",
-    condition: "Used - Good",
-    location: "HTU Campus",
-    postedAgo: "2 days ago",
-    description: "Mixed collection of popular manga series. Some volumes have minor wear.",
+    university: "Ho Technical University",
+    graduationDate: "June 2024",
+    reason: "Upgrading to digital collection",
+    timePosted: "1 week ago",
+    verified: true,
+    urgent: false,
+    items: ["Volumes 1-23", "Exclusive poster", "Box in good condition"],
   },
   {
-    id: "u11",
-    name: "Cosplay Costume (Used)",
-    price: 350,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
+    id: 8,
+    title: "Naruto Shippuden DVD Set (Seasons 1-5)",
+    description: "Original DVD set for Naruto Shippuden. All discs working, some minor scratches on cases.",
+    priceUSD: 50,
+    originalPrice: 150,
+    image: "/placeholder.svg?height=400&width=300", // Placeholder image
+    seller: "Su Augusta",
+    condition: "Fair",
     category: "Anime & Manga",
-    condition: "Used - Fair",
-    location: "Accra Mall",
-    postedAgo: "4 days ago",
-    description: "Used cosplay costume from a popular anime. Size M. Needs a bit of repair.",
-  },
-  {
-    id: "u12",
-    name: "Anime Art Book",
-    price: 120,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
-    category: "Anime & Manga",
-    condition: "Used - Like New",
-    location: "Legon Campus",
-    postedAgo: "1 week ago",
-    description: "Beautiful art book featuring illustrations from various anime. Excellent condition.",
+    university: "University of Ghana",
+    graduationDate: "July 2024",
+    reason: "Streaming now",
+    timePosted: "3 days ago",
+    verified: true,
+    urgent: true,
+    items: ["Season 1 DVD", "Season 2 DVD", "Season 3 DVD", "Season 4 DVD", "Season 5 DVD"],
   },
 ]
 
 export default function UsedProductsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("All")
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const categories = ["All", "Textbooks", "Electronics", "Dorm Essentials", "Apparel", "Anime & Manga", "Other"]
-
-  const filteredProducts = allUsedProducts.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === "All" || product.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
-
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product)
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedProduct(null)
-  }
+  const [selectedProduct, setSelectedProduct] = useState(null)
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageWrapper>
       <div className="container mx-auto px-4 py-8">
-        {/* Removed h1 and p elements as per instructions */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          <div className="flex flex-wrap justify-center md:justify-end gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-                className="transition-all duration-200"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Used Products</h1>
+          <p className="text-muted-foreground">Quality pre-owned items from graduating students at great prices</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <motion.div
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {usedProducts.map((product) => (
+            <Card
               key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+              onClick={() => setSelectedProduct(product)}
             >
-              <Card
-                className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full"
-                onClick={() => handleProductClick(product)}
-              >
-                <div className="relative w-full h-48 bg-gray-100 flex items-center justify-center">
-                  <Image
-                    src={product.imageUrl || "/placeholder.svg"}
-                    alt={product.name}
-                    layout="fill"
-                    objectFit="cover"
-                    className="transition-transform duration-300 hover:scale-105"
-                  />
-                  <Badge className="absolute top-2 left-2 bg-primary-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                    {product.category}
+              <div className="relative">
+                <img
+                  src={product.image || "/placeholder.svg"}
+                  alt={product.title}
+                  className="w-full h-48 object-cover rounded-t-lg"
+                />
+                {product.urgent && (
+                  <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    Urgent
+                  </Badge>
+                )}
+                {product.verified && (
+                  <Badge className="absolute top-2 right-2 bg-green-500 hover:bg-green-600">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Verified
+                  </Badge>
+                )}
+              </div>
+
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg line-clamp-2">{product.title}</CardTitle>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span>{product.seller}</span>
+                  <Badge variant="outline" className="text-xs">
+                    {product.condition}
                   </Badge>
                 </div>
-                <CardContent className="p-4 flex-grow">
-                  <h3 className="text-lg font-semibold text-primary-700 mb-1 line-clamp-2">{product.name}</h3>
-                  <div className="flex items-center text-muted-foreground text-sm mb-2">
-                    <MapPin className="h-4 w-4 mr-1" /> {product.location}
-                  </div>
-                  <div className="flex items-center text-muted-foreground text-sm">
-                    <Clock className="h-4 w-4 mr-1" /> {product.postedAgo}
-                  </div>
-                  <div className="mt-3 text-2xl font-bold text-primary-600">
-                    <PriceDisplay amount={product.price} currency={product.currency} />
-                  </div>
-                </CardContent>
-                <CardFooter className="p-4 bg-gray-50 border-t flex justify-between items-center">
-                  <Button variant="outline" size="sm" className="text-primary-500 hover:bg-primary-50">
-                    <MessageCircle className="h-4 w-4 mr-2" /> Chat
-                  </Button>
-                  <Button variant="ghost" size="icon" className="text-red-500 hover:bg-red-50">
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
-          {filteredProducts.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-10">
-              No products found matching your criteria.
-            </div>
-          )}
-        </div>
+              </CardHeader>
 
-        <div className="mt-10 text-center">
-          <Link href="/create">
-            <Button className="bg-gradient-to-r from-primary-500 to-purple-600 text-white py-3 px-8 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-              <PlusCircle className="h-6 w-6 mr-3" /> Create New Listing
-            </Button>
-          </Link>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
+
+                <div className="flex items-center justify-between">
+                  <PriceDisplayComponent priceUSD={product.priceUSD} size="sm" />
+                  <Badge variant="secondary">{product.category}</Badge>
+                </div>
+
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3" />
+                    <span>{product.university}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{product.timePosted}</span>
+                  </div>
+                </div>
+
+                <Button className="w-full" size="sm">
+                  View Details
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {selectedProduct && (
-          <ProductDetailModal product={selectedProduct} isOpen={isModalOpen} onClose={handleCloseModal} />
+          <ProductDetailModal
+            product={selectedProduct}
+            isOpen={!!selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+          />
         )}
       </div>
-    </div>
+    </PageWrapper>
   )
 }

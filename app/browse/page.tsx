@@ -1,226 +1,243 @@
-"use client"
-
-import { Badge } from "@/components/ui/badge"
-
-import { useState } from "react"
-import Image from "next/image"
+import { Search, Filter, Grid, List, SlidersHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { SearchBar } from "@/components/search-bar"
-import { PriceDisplay } from "@/components/price-display" // Corrected import name
-import { motion } from "framer-motion"
-import { MapPin, Clock, Heart, MessageCircle } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
 
-interface Product {
-  id: string
-  name: string
-  price: number
-  currency: string
-  imageUrl: string
-  category: string
-  condition: string
-  location: string
-  postedAgo: string
-  description: string
-}
-
-const allBrowseItems: Product[] = [
+const products = [
   {
-    id: "b1",
-    name: "Digital Marketing Course Notes",
-    price: 50,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
-    category: "Services",
-    condition: "Digital",
-    location: "Online",
-    postedAgo: "1 hour ago",
-    description: "Comprehensive notes for Digital Marketing course. Includes summaries and exam tips.",
+    id: 1,
+    title: "Calculus: Early Transcendentals - 8th Edition",
+    price: 45,
+    originalPrice: 120,
+    image: "/placeholder.svg?height=200&width=200",
+    seller: "Sarah M.",
+    condition: "Like New",
+    category: "Textbooks",
+    timePosted: "2 hours ago",
   },
   {
-    id: "b2",
-    name: "Tutoring - Math & Physics",
-    price: 75,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
-    category: "Services",
-    condition: "Service",
-    location: "HTU Campus / Online",
-    postedAgo: "3 hours ago",
-    description: "Experienced tutor offering sessions for Calculus, Algebra, and Physics. Flexible hours.",
-  },
-  {
-    id: "b3",
-    name: "Event Photography Service",
-    price: 200,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
-    category: "Services",
-    condition: "Service",
-    location: "Accra",
-    postedAgo: "1 day ago",
-    description: "Professional photography for student events, parties, and portraits. High-quality edits included.",
-  },
-  {
-    id: "b4",
-    name: "Resume & Cover Letter Review",
-    price: 40,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
-    category: "Services",
-    condition: "Service",
-    location: "Online",
-    postedAgo: "6 hours ago",
-    description: "Get your resume and cover letter professionally reviewed and optimized for job applications.",
-  },
-  {
-    id: "b5",
-    name: "Used Bicycle",
-    price: 300,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
-    category: "Other",
-    condition: "Used - Good",
-    location: "Legon Campus",
-    postedAgo: "2 days ago",
-    description: "Mountain bike, good for campus commutes. Some wear and tear, but fully functional.",
-  },
-  {
-    id: "b6",
-    name: "Acoustic Guitar",
-    price: 450,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
-    category: "Other",
-    condition: "Used - Like New",
-    location: "KNUST Campus",
-    postedAgo: "4 days ago",
-    description: "Well-maintained acoustic guitar, perfect for beginners. Comes with a soft case.",
-  },
-  {
-    id: "b7",
-    name: "Cooking Utensils Set",
-    price: 100,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
-    category: "Dorm Essentials",
-    condition: "Used - Good",
-    location: "UCC Campus",
-    postedAgo: "1 week ago",
-    description: "Basic cooking utensils set: pots, pans, spatulas. Essential for dorm cooking.",
-  },
-  {
-    id: "b8",
-    name: "Portable Bluetooth Speaker",
-    price: 180,
-    currency: "GHS",
-    imageUrl: "/placeholder.svg?height=400&width=300",
+    id: 2,
+    title: "MacBook Air M1 - 2021 (256GB)",
+    price: 850,
+    originalPrice: 1200,
+    image: "/placeholder.svg?height=200&width=200",
+    seller: "Mike R.",
+    condition: "Good",
     category: "Electronics",
-    condition: "Used - Like New",
-    location: "Central University",
-    postedAgo: "5 days ago",
-    description: "Compact Bluetooth speaker with great sound. Long battery life, perfect for parties.",
+    timePosted: "5 hours ago",
+  },
+  {
+    id: 3,
+    title: "Mini Fridge - Perfect for Dorms",
+    price: 80,
+    originalPrice: 150,
+    image: "/placeholder.svg?height=200&width=200",
+    seller: "Emma L.",
+    condition: "Excellent",
+    category: "Dorm Items",
+    timePosted: "1 day ago",
+  },
+  {
+    id: 4,
+    title: "Chemistry Lab Coat - Size Medium",
+    price: 15,
+    originalPrice: 35,
+    image: "/placeholder.svg?height=200&width=200",
+    seller: "Alex K.",
+    condition: "Good",
+    category: "Clothing",
+    timePosted: "2 days ago",
+  },
+  {
+    id: 5,
+    title: "Nintendo Switch + 3 Games Bundle",
+    price: 220,
+    originalPrice: 350,
+    image: "/placeholder.svg?height=200&width=200",
+    seller: "Jordan P.",
+    condition: "Like New",
+    category: "Gaming",
+    timePosted: "3 days ago",
+  },
+  {
+    id: 6,
+    title: "Organic Chemistry Textbook + Study Guide",
+    price: 65,
+    originalPrice: 180,
+    image: "/placeholder.svg?height=200&width=200",
+    seller: "Lisa W.",
+    condition: "Good",
+    category: "Textbooks",
+    timePosted: "4 days ago",
   },
 ]
 
 export default function BrowsePage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("All")
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const categories = ["All", "Textbooks", "Electronics", "Dorm Essentials", "Apparel", "Services", "Other"]
-
-  const filteredProducts = allBrowseItems.filter((item) => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === "All" || item.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
-
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product)
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedProduct(null)
-  }
-
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Removed h1 and p elements as per instructions */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          <div className="flex flex-wrap justify-center md:justify-end gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-                className="transition-all duration-200"
-              >
-                {category}
+      {/* Header */}
+      <header className="border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-primary">StudentMarket</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost">My Listings</Button>
+              <Button variant="ghost">Messages</Button>
+              <Button variant="outline">Profile</Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-6">
+        {/* Search and Filters */}
+        <div className="mb-6">
+          <div className="flex flex-col lg:flex-row gap-4 mb-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search for items..." className="pl-10" />
+            </div>
+            <div className="flex gap-2">
+              <Select defaultValue="newest">
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest First</SelectItem>
+                  <SelectItem value="price-low">Price: Low to High</SelectItem>
+                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                  <SelectItem value="condition">Best Condition</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="icon">
+                <Grid className="h-4 w-4" />
               </Button>
-            ))}
+              <Button variant="outline" size="icon">
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((item) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card
-                className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full"
-                onClick={() => handleProductClick(item)}
-              >
-                <div className="relative w-full h-48 bg-gray-100 flex items-center justify-center">
-                  <Image
-                    src={item.imageUrl || "/placeholder.svg"}
-                    alt={item.name}
-                    layout="fill"
-                    objectFit="cover"
-                    className="transition-transform duration-300 hover:scale-105"
-                  />
-                  <Badge className="absolute top-2 left-2 bg-primary-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                    {item.category}
-                  </Badge>
+        <div className="flex gap-6">
+          {/* Sidebar Filters */}
+          <div className="hidden lg:block w-64 space-y-6">
+            <Card>
+              <CardHeader>
+                <h3 className="font-semibold flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                </h3>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Category Filter */}
+                <div>
+                  <Label className="font-medium mb-3 block">Category</Label>
+                  <div className="space-y-2">
+                    {["Textbooks", "Electronics", "Clothing", "Dorm Items", "Gaming", "Food & Drinks"].map(
+                      (category) => (
+                        <div key={category} className="flex items-center space-x-2">
+                          <Checkbox id={category} />
+                          <Label htmlFor={category} className="text-sm">
+                            {category}
+                          </Label>
+                        </div>
+                      ),
+                    )}
+                  </div>
                 </div>
-                <CardContent className="p-4 flex-grow">
-                  <h3 className="text-lg font-semibold text-primary-700 mb-1 line-clamp-2">{item.name}</h3>
-                  <div className="flex items-center text-muted-foreground text-sm mb-2">
-                    <MapPin className="h-4 w-4 mr-1" /> {item.location}
+
+                {/* Price Range */}
+                <div>
+                  <Label className="font-medium mb-3 block">Price Range</Label>
+                  <div className="space-y-3">
+                    <Slider defaultValue={[0, 500]} max={1000} step={10} className="w-full" />
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>$0</span>
+                      <span>$1000+</span>
+                    </div>
                   </div>
-                  <div className="flex items-center text-muted-foreground text-sm">
-                    <Clock className="h-4 w-4 mr-1" /> {item.postedAgo}
+                </div>
+
+                {/* Condition Filter */}
+                <div>
+                  <Label className="font-medium mb-3 block">Condition</Label>
+                  <div className="space-y-2">
+                    {["New", "Like New", "Excellent", "Good", "Fair"].map((condition) => (
+                      <div key={condition} className="flex items-center space-x-2">
+                        <Checkbox id={condition} />
+                        <Label htmlFor={condition} className="text-sm">
+                          {condition}
+                        </Label>
+                      </div>
+                    ))}
                   </div>
-                  <div className="mt-3 text-2xl font-bold text-primary-600">
-                    <PriceDisplay amount={item.price} currency={item.currency} />
-                  </div>
-                </CardContent>
-                <CardFooter className="p-4 bg-gray-50 border-t flex justify-between items-center">
-                  <Button variant="outline" size="sm" className="text-primary-500 hover:bg-primary-50">
-                    <MessageCircle className="h-4 w-4 mr-2" /> Chat
-                  </Button>
-                  <Button variant="ghost" size="icon" className="text-red-500 hover:bg-red-50">
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
-          {filteredProducts.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-10">
-              No items found matching your criteria.
+                </div>
+
+                <Button className="w-full">Apply Filters</Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Product Grid */}
+          <div className="flex-1">
+            <div className="mb-4 flex justify-between items-center">
+              <p className="text-muted-foreground">Showing {products.length} results</p>
+              <Button variant="outline" className="lg:hidden">
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
             </div>
-          )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {products.map((product) => (
+                <Card key={product.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader className="p-0">
+                    <img
+                      src={product.image || "/placeholder.svg"}
+                      alt={product.title}
+                      className="w-full h-48 object-cover rounded-t-lg"
+                    />
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <Badge variant="secondary">{product.category}</Badge>
+                      <Badge variant="outline">{product.condition}</Badge>
+                    </div>
+                    <h4 className="font-semibold mb-2 line-clamp-2">{product.title}</h4>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl font-bold text-green-600">${product.price}</span>
+                      <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                      <span>by {product.seller}</span>
+                      <span>{product.timePosted}</span>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="p-4 pt-0 flex gap-2">
+                    <Button variant="outline" className="flex-1">
+                      Message
+                    </Button>
+                    <Button className="flex-1">View Details</Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+
+            {/* Load More */}
+            <div className="text-center mt-8">
+              <Button variant="outline" size="lg">
+                Load More Items
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

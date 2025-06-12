@@ -1,400 +1,370 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
+import { Upload, Camera, CheckCircle, CreditCard, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Upload, Camera, QrCode, ShieldCheck, Sparkles } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useToast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useAuth } from "@/components/auth/auth-provider"
+import { useRouter } from "next/navigation"
 
 export default function VerifyPage() {
-  const [step, setStep] = useState(1)
-  const [studentId, setStudentId] = useState("")
-  const [idImage, setIdImage] = useState<File | null>(null)
-  const [selfieImage, setSelfieImage] = useState<File | null>(null)
-  const [university, setUniversity] = useState("")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const { toast } = useToast()
+  const { user, updateUser } = useAuth()
   const router = useRouter()
-  const { user, updateUserData } = useAuth()
+  const [verificationMethod, setVerificationMethod] = useState<"student" | "ghana-card">("student")
+  const [idImage, setIdImage] = useState<string | null>(null)
+  const [selfieImage, setSelfieImage] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [verificationStatus, setVerificationStatus] = useState<"pending" | "processing" | "approved">("pending")
 
-  const handleNextStep = () => {
-    if (step === 1 && !studentId) {
-      toast({
-        title: "Student ID Required",
-        description: "Please enter your student ID to proceed.",
-        variant: "destructive",
-      })
-      return
+  const [formData, setFormData] = useState({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    idNumber: "",
+    university: "",
+    phoneNumber: "",
+    isStudent: true,
+  })
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, type: "id" | "selfie") => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        if (type === "id") {
+          setIdImage(result)
+        } else {
+          setSelfieImage(result)
+        }
+      }
+      reader.readAsDataURL(file)
     }
-    if (step === 2 && !idImage) {
-      toast({
-        title: "ID Photo Required",
-        description: "Please upload a clear photo of your student ID.",
-        variant: "destructive",
-      })
-      return
-    }
-    if (step === 3 && !selfieImage) {
-      toast({
-        title: "Selfie Required",
-        description: "Please take a selfie for verification.",
-        variant: "destructive",
-      })
-      return
-    }
-    setStep(step + 1)
   }
 
-  const handlePrevStep = () => {
-    setStep(step - 1)
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleVerify = async () => {
-    setIsProcessing(true)
-    // Simulate API call for verification
+  const submitVerification = async () => {
+    setIsLoading(true)
+    setVerificationStatus("processing")
+
     try {
       const response = await fetch("/api/verification/submit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ studentId, university, userId: user?.id }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          verificationMethod,
+          idImage,
+          selfieImage,
+          userId: user?.id,
+        }),
       })
 
-      if (!response.ok) {
+      if (response.ok) {
+        setVerificationStatus("approved")
+        updateUser({ isVerified: true, isStudent: formData.isStudent })
+
+        // Claim verification tokens
+        if (user?.id) {
+          await fetch("/api/tokens/claim", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: user.id, rewardType: "verify-student", amount: 100 }), // 100 tokens for verification
+          })
+          // Re-fetch user data to update tokens and claimed rewards in context
+          const userRes = await fetch("/api/auth/me")
+          if (userRes.ok) {
+            const userData = await userRes.json()
+            updateUser(userData.user)
+          }
+        }
+
+        // Mint NFT if student
+        if (formData.isStudent) {
+          await mintStudentNFT()
+        }
+      } else {
         throw new Error("Verification failed")
       }
-
-      const data = await response.json()
-
-      if (data.success) {
-        toast({
-          title: "Verification Successful!",
-          description: "Your student status has been verified. Claiming StuFind Tokens...",
-          variant: "default",
-        })
-
-        // Trigger token claim upon successful verification
-        const tokenClaimResponse = await fetch("/api/stufind-tokens/claim-verify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId: user?.id }),
-        })
-
-        if (!tokenClaimResponse.ok) {
-          throw new Error("Failed to claim verification tokens.")
-        }
-
-        const tokenClaimData = await tokenClaimResponse.json()
-        if (tokenClaimData.success) {
-          toast({
-            title: "Tokens Claimed!",
-            description: `You received ${tokenClaimData.amount} StuFind Tokens for verification!`,
-            variant: "default",
-          })
-          // Update user data in auth context
-          if (user) {
-            updateUserData({
-              ...user,
-              stufindTokens: (user.stufindTokens || 0) + tokenClaimData.amount,
-              isVerified: true, // Assuming verification sets this
-              claimedRewards: [...(user.claimedRewards || []), "verify-student"],
-            })
-          }
-        } else {
-          toast({
-            title: "Token Claim Failed",
-            description: tokenClaimData.message || "Could not claim verification tokens.",
-            variant: "destructive",
-          })
-        }
-
-        setStep(5) // Move to success step
-      } else {
-        toast({
-          title: "Verification Failed",
-          description: data.message || "Please check your details and try again.",
-          variant: "destructive",
-        })
-      }
-    } catch (error: any) {
-      toast({
-        title: "Verification Error",
-        description: error.message || "An unexpected error occurred during verification.",
-        variant: "destructive",
-      })
+    } catch (error) {
+      console.error("Verification error:", error)
+      alert("Verification failed. Please try again.")
+      setVerificationStatus("pending")
     } finally {
-      setIsProcessing(false)
+      setIsLoading(false)
     }
   }
 
-  const handleMintNFT = async () => {
-    setIsProcessing(true)
+  const mintStudentNFT = async () => {
     try {
-      const response = await fetch("/api/nft/mint", {
+      await fetch("/api/nft/mint", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId: user?.id, studentId }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user?.id }),
       })
-
-      if (!response.ok) {
-        throw new Error("NFT minting failed.")
-      }
-
-      const data = await response.json()
-      if (data.success) {
-        toast({
-          title: "NFT Minted!",
-          description: "Your verified student status has been minted as an NFT!",
-          variant: "default",
-        })
-        // Optionally update user context or redirect
-        router.push("/wallet")
-      } else {
-        toast({
-          title: "NFT Minting Failed",
-          description: data.message || "Could not mint NFT.",
-          variant: "destructive",
-        })
-      }
-    } catch (error: any) {
-      toast({
-        title: "NFT Minting Error",
-        description: error.message || "An unexpected error occurred during NFT minting.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsProcessing(false)
+      alert("Student NFT minted successfully!")
+    } catch (error) {
+      console.error("NFT minting failed:", error)
     }
   }
 
-  const renderStepContent = () => {
-    switch (step) {
-      case 1:
-        return (
-          <motion.div
-            key="step1"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6"
-          >
-            <CardTitle className="text-2xl font-bold text-primary-700 flex items-center gap-3">
-              <QrCode className="h-6 w-6 text-primary-600" /> Step 1: Enter Student ID
-            </CardTitle>
-            <CardDescription>Please enter your official student ID number.</CardDescription>
-            <Label htmlFor="studentId">Student ID</Label>
-            <Input
-              id="studentId"
-              placeholder="e.g., HTU/2023/001"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              required
-            />
-            <Label htmlFor="university">Your University</Label>
-            <Input
-              id="university"
-              placeholder="e.g., Ho Technical University (HTU)"
-              value={university}
-              onChange={(e) => setUniversity(e.target.value)}
-              required
-            />
-          </motion.div>
-        )
-      case 2:
-        return (
-          <motion.div
-            key="step2"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6"
-          >
-            <CardTitle className="text-2xl font-bold text-primary-700 flex items-center gap-3">
-              <Upload className="h-6 w-6 text-primary-600" /> Step 2: Upload Student ID Photo
-            </CardTitle>
-            <CardDescription>
-              Upload a clear photo of your student ID card. Ensure all details are legible.
-            </CardDescription>
-            <Label htmlFor="idImage">Student ID Photo</Label>
-            <Input
-              id="idImage"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setIdImage(e.target.files ? e.target.files[0] : null)}
-              required
-            />
-            {idImage && (
-              <div className="mt-4 text-sm text-muted-foreground">
-                Selected: {idImage.name} ({(idImage.size / 1024).toFixed(2)} KB)
+  if (verificationStatus === "approved") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardHeader className="text-center">
+            <CheckCircle className="h-16 w-16 mx-auto text-green-500 mb-4" />
+            <CardTitle className="text-2xl text-green-600">Verification Complete!</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 text-center">
+            <p className="text-muted-foreground">
+              {formData.isStudent
+                ? "Your student status has been verified! You can now access all student features."
+                : "Your identity has been verified! Welcome to Stufind."}
+            </p>
+
+            {formData.isStudent && (
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2">🎉 Student NFT Minted!</h3>
+                <p className="text-sm text-muted-foreground">
+                  Your verified student status is now recorded on the blockchain.
+                </p>
               </div>
             )}
-          </motion.div>
-        )
-      case 3:
-        return (
-          <motion.div
-            key="step3"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6"
-          >
-            <CardTitle className="text-2xl font-bold text-primary-700 flex items-center gap-3">
-              <Camera className="h-6 w-6 text-primary-600" /> Step 3: Take a Selfie
-            </CardTitle>
-            <CardDescription>Take a clear selfie holding your student ID next to your face.</CardDescription>
-            <Label htmlFor="selfieImage">Selfie Photo</Label>
-            <Input
-              id="selfieImage"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setSelfieImage(e.target.files ? e.target.files[0] : null)}
-              required
-            />
-            {selfieImage && (
-              <div className="mt-4 text-sm text-muted-foreground">
-                Selected: {selfieImage.name} ({(selfieImage.size / 1024).toFixed(2)} KB)
-              </div>
-            )}
-          </motion.div>
-        )
-      case 4:
-        return (
-          <motion.div
-            key="step4"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6 text-center"
-          >
-            <CardTitle className="text-2xl font-bold text-primary-700 flex items-center justify-center gap-3">
-              <ShieldCheck className="h-6 w-6 text-primary-600" /> Step 4: Review & Submit
-            </CardTitle>
-            <CardDescription>Please review your details before submitting for verification.</CardDescription>
-            <div className="space-y-2 text-left">
-              <p>
-                <span className="font-semibold">Student ID:</span> {studentId}
-              </p>
-              <p>
-                <span className="font-semibold">University:</span> {university}
-              </p>
-              {idImage && (
-                <p>
-                  <span className="font-semibold">ID Photo:</span> {idImage.name}
-                </p>
-              )}
-              {selfieImage && (
-                <p>
-                  <span className="font-semibold">Selfie Photo:</span> {selfieImage.name}
-                </p>
-              )}
+
+            <div className="flex gap-4">
+              <Button className="flex-1" onClick={() => router.push("/marketplace")}>
+                Start Shopping
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => router.push("/create")}>
+                Create Listing
+              </Button>
             </div>
-            <Button
-              onClick={handleVerify}
-              className="w-full bg-gradient-to-r from-primary-500 to-purple-600 text-white py-3 text-lg font-semibold"
-              disabled={isProcessing}
-            >
-              {isProcessing ? (
-                <>
-                  <span className="animate-spin mr-2">⚙️</span> Processing...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="h-6 w-6 mr-3" /> Submit for Verification
-                </>
-              )}
-            </Button>
-          </motion.div>
-        )
-      case 5:
-        return (
-          <motion.div
-            key="step5"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
-            className="space-y-6 text-center"
-          >
-            <CheckCircle className="h-20 w-20 text-green-500 mx-auto mb-4" />
-            <CardTitle className="text-3xl font-bold text-primary-700">Verification Complete!</CardTitle>
-            <CardDescription className="text-lg">
-              Congratulations! Your student status has been successfully verified.
-            </CardDescription>
-            <Button
-              onClick={handleMintNFT}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 text-lg font-semibold mt-4"
-              disabled={isProcessing || user?.claimedRewards?.includes("student-nft-mint")}
-            >
-              {isProcessing ? (
-                <>
-                  <span className="animate-spin mr-2">⚙️</span> Minting NFT...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-6 w-6 mr-3" /> Mint Student NFT
-                </>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/")}
-              className="w-full mt-2 text-primary-500 hover:bg-primary-50"
-            >
-              Go to Homepage
-            </Button>
-          </motion.div>
-        )
-      default:
-        return null
-    }
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (verificationStatus === "processing") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="p-8 text-center">
+            <div className="animate-spin h-16 w-16 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <h3 className="text-xl font-semibold mb-2">Processing Verification...</h3>
+            <p className="text-muted-foreground">This usually takes 30 seconds to 1 minute.</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
-      <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto">
-          {/* Removed h1 and p elements as per instructions */}
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-primary-700 mb-4">Student Verification</h1>
-            <p className="text-lg text-muted-foreground">
-              Verify your student status to unlock exclusive features and rewards.
-            </p>
-          </div>
-
-          <Card className="shadow-lg border-primary-200">
-            <CardContent className="p-6">
-              <AnimatePresence mode="wait">{renderStepContent()}</AnimatePresence>
-              {step < 5 && (
-                <div className="flex justify-between mt-8">
-                  {step > 1 && (
-                    <Button variant="outline" onClick={handlePrevStep} disabled={isProcessing}>
-                      Previous
-                    </Button>
-                  )}
-                  {step < 4 && (
-                    <Button onClick={handleNextStep} disabled={isProcessing}>
-                      Next
-                    </Button>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 p-4">
+      <div className="container mx-auto max-w-2xl py-8">
+        <div className="text-center mb-8">
+          <CreditCard className="h-16 w-16 mx-auto text-blue-600 mb-4" />
+          <h1 className="text-4xl font-bold mb-4 text-blue-800">Quick Verification</h1>
+          <p className="text-slate-600 text-lg">Verify your identity to access all Stufind features</p>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Identity Verification</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Verification Method */}
+            <div>
+              <Label className="text-base font-semibold">I am verifying as:</Label>
+              <RadioGroup
+                value={verificationMethod}
+                onValueChange={(value: "student" | "ghana-card") => {
+                  setVerificationMethod(value)
+                  setFormData((prev) => ({ ...prev, isStudent: value === "student" }))
+                }}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="student" id="student" />
+                  <Label htmlFor="student">Student (with Student ID)</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="ghana-card" id="ghana-card" />
+                  <Label htmlFor="ghana-card">General User (with Ghana Card)</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Basic Info */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange("firstName", e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="idNumber">
+                {verificationMethod === "student" ? "Student ID Number" : "Ghana Card Number"}
+              </Label>
+              <Input
+                id="idNumber"
+                value={formData.idNumber}
+                onChange={(e) => handleInputChange("idNumber", e.target.value)}
+                placeholder={verificationMethod === "student" ? "e.g., 2021/12345" : "e.g., GHA-123456789-1"}
+                required
+              />
+            </div>
+
+            {verificationMethod === "student" && (
+              <div>
+                <Label htmlFor="university">University</Label>
+                <Select value={formData.university} onValueChange={(value) => handleInputChange("university", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your university" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ug">University of Ghana</SelectItem>
+                    <SelectItem value="knust">KNUST</SelectItem>
+                    <SelectItem value="ucc">University of Cape Coast</SelectItem>
+                    <SelectItem value="ashesi">Ashesi University</SelectItem>
+                    <SelectItem value="gimpa">GIMPA</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Input
+                id="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                placeholder="+233 XX XXX XXXX"
+                required
+              />
+            </div>
+
+            {/* ID Upload */}
+            <div>
+              <Label className="text-base font-semibold">
+                Upload {verificationMethod === "student" ? "Student ID" : "Ghana Card"}
+              </Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center mt-2">
+                {idImage ? (
+                  <div>
+                    <img
+                      src={idImage || "/placeholder.svg"}
+                      alt="ID"
+                      className="max-w-full h-32 mx-auto rounded-lg mb-4"
+                    />
+                    <p className="text-sm text-green-600 mb-4">✓ ID uploaded successfully</p>
+                    <Button variant="outline" onClick={() => setIdImage(null)}>
+                      Upload Different Image
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Upload className="h-8 w-8 mx-auto mb-4 text-gray-400" />
+                    <p className="font-semibold mb-2">Upload ID Image</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, "id")}
+                      className="hidden"
+                      id="idUpload"
+                    />
+                    <Button asChild>
+                      <label htmlFor="idUpload" className="cursor-pointer">
+                        <Camera className="h-4 w-4 mr-2" />
+                        Choose Image
+                      </label>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Selfie Upload */}
+            <div>
+              <Label className="text-base font-semibold">Take a Selfie</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center mt-2">
+                {selfieImage ? (
+                  <div>
+                    <img
+                      src={selfieImage || "/placeholder.svg"}
+                      alt="Selfie"
+                      className="w-32 h-32 mx-auto rounded-full object-cover mb-4"
+                    />
+                    <p className="text-sm text-green-600 mb-4">✓ Selfie uploaded successfully</p>
+                    <Button variant="outline" onClick={() => setSelfieImage(null)}>
+                      Take New Selfie
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <User className="h-8 w-8 mx-auto mb-4 text-gray-400" />
+                    <p className="font-semibold mb-2">Take a Selfie</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="user"
+                      onChange={(e) => handleImageUpload(e, "selfie")}
+                      className="hidden"
+                      id="selfieUpload"
+                    />
+                    <Button asChild>
+                      <label htmlFor="selfieUpload" className="cursor-pointer">
+                        <Camera className="h-4 w-4 mr-2" />
+                        Take Selfie
+                      </label>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <Alert>
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>
+                By submitting, you confirm that all information is accurate and agree to our terms of service.
+              </AlertDescription>
+            </Alert>
+
+            <Button
+              onClick={submitVerification}
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-700"
+              disabled={!idImage || !selfieImage || isLoading}
+            >
+              {isLoading ? "Processing..." : "Submit Verification"}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

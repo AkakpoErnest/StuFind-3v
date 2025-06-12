@@ -15,10 +15,11 @@ export function Navigation() {
   const router = useRouter()
   const pathname = usePathname()
   const { user, signOut, isAuthenticated } = useAuth()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false) // Consistent state variable name
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [canGoBack, setCanGoBack] = useState(false)
 
   useEffect(() => {
+    // Check if we can go back
     setCanGoBack(pathname !== "/" && window.history.length > 1)
   }, [pathname])
 
@@ -181,7 +182,7 @@ export function Navigation() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} // Consistent state setter
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden" // This button is specifically for mobile
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
@@ -207,7 +208,7 @@ export function Navigation() {
                     variant={pathname === item.href ? "default" : "ghost"}
                     asChild
                     className="justify-start"
-                    onClick={() => setIsMobileMenuOpen(false)} // Consistent state setter
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <Link href={item.href}>
                       {item.label === "WhatsApp AI" ? <Bot className="h-4 w-4 mr-2" /> : null}
@@ -232,7 +233,7 @@ export function Navigation() {
                       variant="outline"
                       onClick={() => {
                         signOut()
-                        setIsMobileMenuOpen(false) // Consistent state setter
+                        setIsMobileMenuOpen(false)
                       }}
                       className="justify-start"
                     >
