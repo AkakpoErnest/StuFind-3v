@@ -71,7 +71,7 @@ export default function ListingForm() {
         <div className="max-w-3xl mx-auto">
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold mb-2 text-primary-700">Create a New Listing</h1>
-            <p className="text-muted-foreground text-lg">Sell your items to fellow students easily.</p>
+            <p className="text-lg text-muted-foreground">Sell your items to fellow students easily.</p>
           </div>
 
           <Card className="shadow-lg border-primary-200">

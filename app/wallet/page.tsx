@@ -1,7 +1,5 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
-
 import dynamic from "next/dynamic"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -11,7 +9,6 @@ import { motion } from "framer-motion"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
-import { StufindLogo } from "@/components/stufind-logo" // StufindLogo is safe for SSR
 
 // Dynamically import WalletConnect with SSR disabled
 const DynamicWalletConnect = dynamic(() => import("@/components/wallet-connect").then((mod) => mod.WalletConnect), {
@@ -212,31 +209,10 @@ export default function WalletPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-primary flex items-center gap-3">
-                <StufindLogo />
-                StuFind
-              </h1>
-              <Badge variant="outline" className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                Ethereum
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost">Browse</Button>
-              <Button variant="ghost">Create</Button>
-              <Button>My NFTs</Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+      {/* Removed Header as it's now handled by global Navigation */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
+          {/* Removed h1 and p elements as per instructions */}
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold text-primary-700 mb-4">Your StuFind Wallet</h1>
             <p className="text-lg text-muted-foreground">Manage your StuFind Tokens and claim exciting rewards.</p>

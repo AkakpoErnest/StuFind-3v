@@ -60,7 +60,7 @@ export default function PostJobForm() {
         <div className="max-w-3xl mx-auto">
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold mb-2 text-primary-700">Post a New Job Opportunity</h1>
-            <p className="text-muted-foreground text-lg">Reach thousands of talented students across Ghana.</p>
+            <p className="text-lg text-muted-foreground">Reach thousands of talented students across Ghana.</p>
           </div>
 
           <Card className="shadow-lg border-primary-200">

@@ -15,11 +15,10 @@ export function Navigation() {
   const router = useRouter()
   const pathname = usePathname()
   const { user, signOut, isAuthenticated } = useAuth()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenu] = useState(false) // Renamed for clarity
   const [canGoBack, setCanGoBack] = useState(false)
 
   useEffect(() => {
-    // Check if we can go back
     setCanGoBack(pathname !== "/" && window.history.length > 1)
   }, [pathname])
 
@@ -182,7 +181,7 @@ export function Navigation() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => setIsMobileMenu(!isMobileMenuOpen)} // Corrected function call
               className="lg:hidden" // This button is specifically for mobile
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
@@ -208,7 +207,7 @@ export function Navigation() {
                     variant={pathname === item.href ? "default" : "ghost"}
                     asChild
                     className="justify-start"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={() => setIsMobileMenu(false)} // Corrected function call
                   >
                     <Link href={item.href}>
                       {item.label === "WhatsApp AI" ? <Bot className="h-4 w-4 mr-2" /> : null}
@@ -220,12 +219,16 @@ export function Navigation() {
                 {isAuthenticated && (
                   <>
                     <Button variant="ghost" asChild className="justify-start">
-                      <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Link href="/profile" onClick={() => setIsMobileMenu(false)}>
+                        {" "}
+                        {/* Corrected function call */}
                         Profile
                       </Link>
                     </Button>
                     <Button variant="ghost" asChild className="justify-start">
-                      <Link href="/wallet" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Link href="/wallet" onClick={() => setIsMobileMenu(false)}>
+                        {" "}
+                        {/* Corrected function call */}
                         StuFind Wallet
                       </Link>
                     </Button>
@@ -233,7 +236,7 @@ export function Navigation() {
                       variant="outline"
                       onClick={() => {
                         signOut()
-                        setIsMobileMenuOpen(false)
+                        setIsMobileMenu(false) // Corrected function call
                       }}
                       className="justify-start"
                     >

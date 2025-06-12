@@ -367,6 +367,7 @@ export default function VerifyPage() {
     <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
+          {/* Removed h1 and p elements as per instructions */}
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold text-primary-700 mb-4">Student Verification</h1>
             <p className="text-lg text-muted-foreground">

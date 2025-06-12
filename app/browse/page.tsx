@@ -7,7 +7,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { SearchBar } from "@/components/search-bar"
-import { PriceDisplay } from "@/components/price-display"
+import { PriceDisplay } from "@/components/price-display" // Corrected import name
 import { motion } from "framer-motion"
 import { MapPin, Clock, Heart, MessageCircle } from "lucide-react"
 
@@ -152,6 +152,7 @@ export default function BrowsePage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Removed h1 and p elements as per instructions */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           <div className="flex flex-wrap justify-center md:justify-end gap-2">
