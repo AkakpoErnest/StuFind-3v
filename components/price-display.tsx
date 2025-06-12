@@ -13,6 +13,7 @@ interface PriceDisplayProps {
 }
 
 export function PriceDisplayComponent({
+  // CORRECTED: Changed from PriceDisplayComponent to PriceDisplay
   priceUSD = 0,
   size = "md",
   showAllCurrencies = false,

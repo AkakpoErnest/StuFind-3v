@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
-            <Navigation /> {/* Ensure the Navigation component is rendered here */}
+            <Navigation /> {/* This is the ONLY place Navigation is rendered */}
             {children}
           </AuthProvider>
         </ThemeProvider>
