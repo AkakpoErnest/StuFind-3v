@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
-const sql = neon(process.env.NEON_NEON_DATABASE_URL!)
+const sql = neon(process.env.NEON_NEON_NEON_NEON_DATABASE_URL!)
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +12,10 @@ export async function POST(request: NextRequest) {
     // Validate input
     if (!email || !password || !firstName || !lastName) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 })
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 })
     }
 
     // Check if user already exists
@@ -24,13 +28,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12)
+    const passwordHash = await bcrypt.hash(password, 12)
 
     // Create user
     const newUser = await sql`
-      INSERT INTO users (email, password_hash, first_name, last_name, auth_method, created_at)
-      VALUES (${email}, ${hashedPassword}, ${firstName}, ${lastName}, 'email', NOW())
-      RETURNING id, email, first_name, last_name, is_verified, university, auth_method
+      INSERT INTO users (email, password_hash, first_name, last_name, auth_method, is_verified, is_student)
+      VALUES (${email}, ${passwordHash}, ${firstName}, ${lastName}, 'email', false, false)
+      RETURNING id, email, first_name, last_name, is_verified, is_student, auth_method
     `
 
     const user = newUser[0]
@@ -38,14 +42,14 @@ export async function POST(request: NextRequest) {
     // Create JWT token
     const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: "7d" })
 
-    // Set cookie
+    // Set HTTP-only cookie
     const response = NextResponse.json({
       id: user.id,
       email: user.email,
       firstName: user.first_name,
       lastName: user.last_name,
       isVerified: user.is_verified,
-      university: user.university,
+      isStudent: user.is_student,
       authMethod: user.auth_method,
     })
 
@@ -59,6 +63,6 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     console.error("Signup error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to create account" }, { status: 500 })
   }
 }

@@ -13,7 +13,7 @@ interface PriceDisplayProps {
 }
 
 export function PriceDisplayComponent({
-  priceUSD,
+  priceUSD = 0,
   size = "md",
   showAllCurrencies = false,
   primaryCurrency = "cedis",
@@ -22,24 +22,39 @@ export function PriceDisplayComponent({
   const [prices, setPrices] = useState<PriceDisplay | null>(null)
   const [currentCurrency, setCurrentCurrency] = useState(primaryCurrency)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadRates()
   }, [])
 
   useEffect(() => {
-    if (rates) {
-      setPrices(convertPrice(priceUSD, rates))
+    if (rates && typeof priceUSD === "number" && !isNaN(priceUSD)) {
+      try {
+        setPrices(convertPrice(priceUSD, rates))
+        setError(null)
+      } catch (err) {
+        console.error("Error converting price:", err)
+        setError("Price conversion failed")
+      }
     }
   }, [priceUSD, rates])
 
   const loadRates = async () => {
     try {
       setLoading(true)
+      setError(null)
       const newRates = await getCurrentRates()
       setRates(newRates)
     } catch (error) {
       console.error("Failed to load rates:", error)
+      setError("Failed to load exchange rates")
+      // Set fallback rates
+      setRates({
+        usd: 1,
+        ghs: 12.5,
+        eth: 1800,
+      })
     } finally {
       setLoading(false)
     }
@@ -52,12 +67,16 @@ export function PriceDisplayComponent({
     setCurrentCurrency(currencies[nextIndex])
   }
 
-  if (loading || !prices) {
+  if (loading) {
     return (
       <div className="animate-pulse">
         <div className="h-6 bg-gray-200 rounded w-20"></div>
       </div>
     )
+  }
+
+  if (error || !prices) {
+    return <div className="text-red-500 text-sm">Price unavailable</div>
   }
 
   const sizeClasses = {
@@ -72,7 +91,7 @@ export function PriceDisplayComponent({
   if (showAllCurrencies) {
     return (
       <div className="space-y-2">
-        <div className={`font-bold text-green-600 ${sizeClasses[size]}`}>{prices.formatted.cedis}</div>
+        <div className={`font-bold text-blue-600 ${sizeClasses[size]}`}>{prices.formatted.cedis}</div>
         <div className="flex gap-2 text-sm text-muted-foreground">
           <span>{prices.formatted.usd}</span>
           <span>•</span>
@@ -84,7 +103,7 @@ export function PriceDisplayComponent({
 
   return (
     <div className="flex items-center gap-2">
-      <span className={`font-bold text-green-600 ${sizeClasses[size]}`}>{primaryPrice}</span>
+      <span className={`font-bold text-blue-600 ${sizeClasses[size]}`}>{primaryPrice}</span>
       <Button variant="ghost" size="sm" onClick={cycleCurrency} className="h-6 px-2 text-xs">
         <RotateCcw className="h-3 w-3 mr-1" />
         {primaryLabel}

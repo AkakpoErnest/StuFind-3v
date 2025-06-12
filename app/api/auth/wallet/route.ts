@@ -3,21 +3,20 @@ import { neon } from "@neondatabase/serverless"
 import { ethers } from "ethers"
 import jwt from "jsonwebtoken"
 
-const sql = neon(process.env.NEON_NEON_DATABASE_URL!)
+const sql = neon(process.env.NEON_NEON_NEON_NEON_DATABASE_URL!)
 
 export async function POST(request: NextRequest) {
   try {
-    const { address, message, signature } = await request.json()
+    const { walletAddress, message, signature } = await request.json()
 
-    // Validate input
-    if (!address || !message || !signature) {
-      return NextResponse.json({ error: "Address, message, and signature are required" }, { status: 400 })
+    if (!walletAddress || !message || !signature) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
     // Verify signature
     try {
-      const recoveredAddress = ethers.utils.verifyMessage(message, signature)
-      if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
+      const recoveredAddress = ethers.verifyMessage(message, signature)
+      if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
       }
     } catch (error) {
@@ -26,18 +25,18 @@ export async function POST(request: NextRequest) {
 
     // Check if user exists
     const users = await sql`
-      SELECT id, wallet_address, first_name, last_name, is_verified, university, auth_method
+      SELECT id, wallet_address, first_name, last_name, is_verified, is_student, auth_method
       FROM users 
-      WHERE wallet_address = ${address.toLowerCase()} AND auth_method = 'wallet'
+      WHERE wallet_address = ${walletAddress}
     `
 
     let user
     if (users.length === 0) {
       // Create new user
       const newUsers = await sql`
-        INSERT INTO users (wallet_address, auth_method, created_at)
-        VALUES (${address.toLowerCase()}, 'wallet', NOW())
-        RETURNING id, wallet_address, first_name, last_name, is_verified, university, auth_method
+        INSERT INTO users (wallet_address, auth_method, is_verified, is_student)
+        VALUES (${walletAddress}, 'wallet', false, false)
+        RETURNING id, wallet_address, first_name, last_name, is_verified, is_student, auth_method
       `
       user = newUsers[0]
     } else {
@@ -49,14 +48,20 @@ export async function POST(request: NextRequest) {
       expiresIn: "7d",
     })
 
-    // Set cookie
+    // Track login activity
+    await sql`
+      INSERT INTO user_activities (user_id, action, created_at)
+      VALUES (${user.id}, 'wallet_login', NOW())
+    `
+
+    // Set HTTP-only cookie
     const response = NextResponse.json({
       id: user.id,
       walletAddress: user.wallet_address,
       firstName: user.first_name,
       lastName: user.last_name,
       isVerified: user.is_verified,
-      university: user.university,
+      isStudent: user.is_student,
       authMethod: user.auth_method,
     })
 
@@ -70,6 +75,6 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     console.error("Wallet auth error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Wallet authentication failed" }, { status: 500 })
   }
 }

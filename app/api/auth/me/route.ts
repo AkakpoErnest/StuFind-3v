@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
 import jwt from "jsonwebtoken"
 
-const sql = neon(process.env.NEON_NEON_DATABASE_URL!)
+const sql = neon(process.env.NEON_NEON_NEON_NEON_DATABASE_URL!)
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,12 +12,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No token provided" }, { status: 401 })
     }
 
-    // Verify JWT
+    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
 
-    // Get user from database
+    // Get user data
     const users = await sql`
-      SELECT id, email, wallet_address, first_name, last_name, is_verified, university, auth_method
+      SELECT id, email, wallet_address, first_name, last_name, is_verified, is_student, auth_method
       FROM users 
       WHERE id = ${decoded.userId}
     `
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       firstName: user.first_name,
       lastName: user.last_name,
       isVerified: user.is_verified,
-      university: user.university,
+      isStudent: user.is_student,
       authMethod: user.auth_method,
     })
   } catch (error) {

@@ -12,7 +12,7 @@ const teamMembers = [
     role: "Co-Founder & Product Designer",
     bio: "Product designer and entrepreneur passionate about creating accessible solutions for African students. Focused on bridging the gap between traditional and digital commerce.",
     image: "/placeholder.svg?height=150&width=150",
-    university: "Ho Technical University (HTU)",
+    university: "Product Design Expert",
     skills: ["UI/UX Design", "Product Strategy", "User Research", "Figma"],
     social: {
       github: "https://github.com/joeemmanuel",
@@ -29,10 +29,10 @@ const teamMembers = [
   {
     id: 2,
     name: "Akakpo Ernest",
-    role: "Lead Developer",
-    bio: "Full-stack developer and blockchain enthusiast from HTU. Specializes in building scalable platforms that serve emerging markets with focus on financial inclusion.",
+    role: "Lead Developer & Co-Founder",
+    bio: "Full-stack developer and blockchain enthusiast. Specializes in building scalable platforms that serve emerging markets with focus on financial inclusion and student empowerment.",
     image: "/images/team/akakpo-ernest.png",
-    university: "Ho Technical University (HTU)",
+    university: "Blockchain Developer",
     skills: ["React", "Solidity", "Node.js", "Web3", "Smart Contracts"],
     social: {
       github: "https://github.com/akakpoernest",
@@ -40,7 +40,27 @@ const teamMembers = [
       twitter: "https://twitter.com/akakpoernest",
       email: "ernest@stufind.app",
     },
-    achievements: ["Blockchain Developer Certification", "Built 5+ DeFi applications", "Mentor at HTU Tech Hub"],
+    achievements: ["Blockchain Developer Certification", "Built 5+ DeFi applications", "Tech Community Mentor"],
+  },
+  {
+    id: 3,
+    name: "Su Augusta",
+    role: "Co-Founder & Marketing Lead",
+    bio: "Marketing strategist and growth expert passionate about connecting students across Ghana. Leads community building and user acquisition initiatives for the platform.",
+    image: "/placeholder.svg?height=150&width=150",
+    university: "Marketing Strategist",
+    skills: ["Digital Marketing", "Community Building", "Growth Strategy", "Content Creation"],
+    social: {
+      github: "https://github.com/suaugusta",
+      linkedin: "https://linkedin.com/in/suaugusta",
+      twitter: "https://twitter.com/suaugusta",
+      email: "augusta@stufind.app",
+    },
+    achievements: [
+      "Grew student communities to 10K+ members",
+      "Expert in African market penetration",
+      "Led successful product launches",
+    ],
   },
 ]
 
@@ -51,12 +71,12 @@ export function TeamProfiles() {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4 text-blue-800 dark:text-blue-200">Meet the Founders</h2>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Two passionate students who saw the need for a better way for Ghanaian students to trade safely and
+            Three passionate innovators who saw the need for a better way for Ghanaian students to trade safely and
             securely.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {teamMembers.map((member) => (
             <Card
               key={member.id}
