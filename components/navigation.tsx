@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter, usePathname } from "next/navigation"
-import { ArrowLeft, Home, User, Menu, X, Coins } from "lucide-react"
+import { ArrowLeft, Home, User, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { StufindLogo } from "@/components/stufind-logo"
 import { Badge } from "@/components/ui/badge"
@@ -93,7 +93,6 @@ export function Navigation() {
                     size="icon"
                     onClick={handleBack}
                     className="hover:bg-primary/10 transition-colors duration-200"
-                    aria-label="Go back"
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
@@ -144,7 +143,7 @@ export function Navigation() {
           <div className="flex items-center space-x-2">
             {/* Home Button (only on non-home pages) */}
             {!isHomePage && (
-              <Button variant="ghost" size="icon" asChild className="hidden sm:flex" aria-label="Go to Home">
+              <Button variant="ghost" size="icon" asChild className="hidden sm:flex">
                 <Link href="/">
                   <Home className="h-5 w-5" />
                 </Link>
@@ -154,18 +153,9 @@ export function Navigation() {
             {/* User Section */}
             {isAuthenticated ? (
               <div className="flex items-center space-x-2">
-                <span className="text-sm hidden md:block text-muted-foreground">
-                  {user?.firstName || user?.walletAddress?.slice(0, 6)}
-                </span>
-                <Button variant="ghost" size="icon" asChild aria-label="User Profile">
-                  <Link href="/profile">
-                    <User className="h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="icon" asChild aria-label="StuFind Tokens">
-                  <Link href="/wallet">
-                    <Coins className="h-5 w-5 text-yellow-500" />
-                  </Link>
+                <span className="text-sm hidden md:block">{user?.firstName || user?.walletAddress?.slice(0, 6)}</span>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
                 </Button>
               </div>
             ) : null}
@@ -178,7 +168,6 @@ export function Navigation() {
               size="icon"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden"
-              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -213,11 +202,6 @@ export function Navigation() {
                     <Button variant="ghost" asChild className="justify-start">
                       <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
                         Profile
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" asChild className="justify-start">
-                      <Link href="/wallet" onClick={() => setIsMobileMenuOpen(false)}>
-                        StuFind Wallet
                       </Link>
                     </Button>
                     <Button

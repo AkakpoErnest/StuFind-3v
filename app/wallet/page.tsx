@@ -1,29 +1,28 @@
 "use client"
 
-import dynamic from "next/dynamic"
+import { WalletConnect } from "@/components/wallet-connect"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { TrendingUp, ShoppingBag, DollarSign } from "lucide-react"
-import { StufindLogo } from "@/components/stufind-logo" // StufindLogo is safe for SSR
 
-// Dynamically import WalletConnect with SSR disabled
-const DynamicWalletConnect = dynamic(() => import("@/components/wallet-connect").then((mod) => mod.WalletConnect), {
-  ssr: false, // This is the key: prevents server-side rendering of this component
-  loading: () => (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 animate-pulse" />
-          Loading Wallet...
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground">Please wait while we prepare your wallet connection.</p>
-      </CardContent>
-    </Card>
-  ), // Optional loading state
-})
+const StufindLogo = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" className="rounded-lg">
+    <defs>
+      <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3B82F6" />
+        <stop offset="50%" stopColor="#8B5CF6" />
+        <stop offset="100%" stopColor="#EC4899" />
+      </linearGradient>
+    </defs>
+    <rect width="32" height="32" rx="8" fill="url(#logoGradient)" />
+    <circle cx="12" cy="12" r="6" fill="none" stroke="white" strokeWidth="2" />
+    <path d="16 16l4 4" stroke="white" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="2" fill="white" />
+    <rect x="20" y="22" width="8" height="2" rx="1" fill="white" opacity="0.8" />
+    <rect x="22" y="25" width="6" height="2" rx="1" fill="white" opacity="0.6" />
+  </svg>
+)
 
 export default function WalletPage() {
   return (
@@ -35,7 +34,7 @@ export default function WalletPage() {
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-primary flex items-center gap-3">
                 <StufindLogo />
-                StuFind
+                Stufind
               </h1>
               <Badge variant="outline" className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
@@ -55,13 +54,14 @@ export default function WalletPage() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-2">Connect Your Wallet</h2>
-            <p className="text-muted-foreground">Connect your Ethereum wallet to start buying and selling on StuFind</p>
+            <p className="text-muted-foreground">Connect your Ethereum wallet to start buying and selling on Stufind</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Wallet Connection */}
             <div className="space-y-6">
-              <DynamicWalletConnect /> {/* Use the dynamically imported component here */}
+              <WalletConnect />
+
               {/* Quick Actions */}
               <Card>
                 <CardHeader>

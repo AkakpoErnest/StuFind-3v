@@ -39,40 +39,29 @@ export const getCurrentRates = async (): Promise<CurrencyRate> => {
 }
 
 export const convertPrice = (priceInUSD: number, rates: CurrencyRate): PriceDisplay => {
-  // Add safety checks for undefined values
-  const safePrice = typeof priceInUSD === "number" && !isNaN(priceInUSD) ? priceInUSD : 0
-  const safeRates = {
-    usd: typeof rates?.usd === "number" && !isNaN(rates.usd) ? rates.usd : 1,
-    ghs: typeof rates?.ghs === "number" && !isNaN(rates.ghs) ? rates.ghs : 12.5,
-    eth: typeof rates?.eth === "number" && !isNaN(rates.eth) ? rates.eth : 1800,
-  }
-
-  const cedis = safePrice * safeRates.ghs
-  const eth = safePrice / safeRates.eth
+  const cedis = priceInUSD * rates.ghs
+  const eth = priceInUSD / rates.eth
 
   return {
     cedis,
-    usd: safePrice,
+    usd: priceInUSD,
     eth,
     formatted: {
       cedis: `₵${cedis.toFixed(2)}`,
-      usd: `$${safePrice.toFixed(2)}`,
+      usd: `$${priceInUSD.toFixed(2)}`,
       eth: `${eth.toFixed(4)} ETH`,
     },
   }
 }
 
 export const formatCedis = (amount: number): string => {
-  const safeAmount = typeof amount === "number" && !isNaN(amount) ? amount : 0
-  return `₵${safeAmount.toLocaleString("en-GH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return `₵${amount.toLocaleString("en-GH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 export const formatUSD = (amount: number): string => {
-  const safeAmount = typeof amount === "number" && !isNaN(amount) ? amount : 0
-  return `$${safeAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 export const formatETH = (amount: number): string => {
-  const safeAmount = typeof amount === "number" && !isNaN(amount) ? amount : 0
-  return `${safeAmount.toFixed(6)} ETH`
+  return `${amount.toFixed(6)} ETH`
 }
