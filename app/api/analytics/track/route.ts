@@ -1,12 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
 
+// Use a singleton pattern for the Neon client to ensure it's initialized once
+// and that environment variables are available at runtime.
 let sqlInstance: ReturnType<typeof neon> | null = null
 
 function getSqlClient() {
   if (!sqlInstance) {
     const databaseUrl = process.env.NEON_NEON_DATABASE_URL // Standardized variable name
     if (!databaseUrl) {
+      // Throw a more descriptive error if the environment variable is missing
       throw new Error(
         "Database connection string (NEON_DATABASE_URL) is not set. Please ensure it's configured in your Vercel project environment variables.",
       )
@@ -18,7 +21,7 @@ function getSqlClient() {
 
 export async function POST(request: NextRequest) {
   try {
-    const sql = getSqlClient()
+    const sql = getSqlClient() // Get the initialized client
     const { action, userId, timestamp } = await request.json()
 
     await sql`
@@ -29,6 +32,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Analytics tracking error:", error)
+    // Provide a more specific error response for the client
     if (error instanceof Error && error.message.includes("Database connection string")) {
       return NextResponse.json(
         { error: "Server configuration error: Database URL missing. Please contact support." },
