@@ -1,103 +1,132 @@
-import Image from "next/image"
+"use client"
 
-export default function Home() {
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { MessageCircle, Bot, Settings, Zap, Globe } from "lucide-react"
+import { motion } from "framer-motion"
+
+export default function WhatsAppAIPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-100 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/whatsapp-ai/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto text-center mb-12">
+          <h1 className="text-4xl font-bold text-primary-700 mb-4">StuFind WhatsApp AI Chatbot</h1>
+          <p className="text-lg text-muted-foreground">
+            Connect with our AI-powered chatbot on WhatsApp for instant support, marketplace queries, and more!
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <Card className="shadow-lg border-primary-200 h-full flex flex-col">
+              <CardHeader className="bg-primary-50/50 border-b border-primary-100 text-center">
+                <MessageCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl font-semibold text-primary-700">Instant Support</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 flex-grow">
+                <CardDescription className="text-base text-gray-700">
+                  Get immediate answers to your questions about StuFind, marketplace rules, verification, and more.
+                </CardDescription>
+              </CardContent>
+              <div className="p-6 pt-0">
+                <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Chat on WhatsApp</Button>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            By <Image src="/vercel.svg" alt="Vercel Logo" className="dark:invert" width={100} height={24} priority />
-          </a>
+            <Card className="shadow-lg border-primary-200 h-full flex flex-col">
+              <CardHeader className="bg-primary-50/50 border-b border-primary-100 text-center">
+                <Bot className="h-16 w-16 text-primary-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl font-semibold text-primary-700">Marketplace Queries</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 flex-grow">
+                <CardDescription className="text-base text-gray-700">
+                  Ask the bot about product availability, pricing, or even get recommendations based on your needs.
+                </CardDescription>
+              </CardContent>
+              <div className="p-6 pt-0">
+                <Button variant="outline" className="w-full text-primary-500 hover:bg-primary-50">
+                  Learn More
+                </Button>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <Card className="shadow-lg border-primary-200 h-full flex flex-col">
+              <CardHeader className="bg-primary-50/50 border-b border-primary-100 text-center">
+                <Settings className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl font-semibold text-primary-700">Customizable Bots</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 flex-grow">
+                <CardDescription className="text-base text-gray-700">
+                  (Coming Soon) Create your own custom bots for student organizations or personal projects.
+                </CardDescription>
+              </CardContent>
+              <div className="p-6 pt-0">
+                <Button disabled className="w-full">
+                  Build Your Bot
+                </Button>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <Card className="shadow-lg border-primary-200 h-full flex flex-col">
+              <CardHeader className="bg-primary-50/50 border-b border-primary-100 text-center">
+                <Zap className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl font-semibold text-primary-700">Quick & Efficient</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 flex-grow">
+                <CardDescription className="text-base text-gray-700">
+                  Our AI chatbot is designed for speed, providing quick responses to keep you moving.
+                </CardDescription>
+              </CardContent>
+              <div className="p-6 pt-0">
+                <Button variant="outline" className="w-full text-primary-500 hover:bg-primary-50">
+                  See Features
+                </Button>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            <Card className="shadow-lg border-primary-200 h-full flex flex-col">
+              <CardHeader className="bg-primary-50/50 border-b border-primary-100 text-center">
+                <Globe className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl font-semibold text-primary-700">Multi-Language Support</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 flex-grow">
+                <CardDescription className="text-base text-gray-700">
+                  Communicate with the bot in multiple languages for a truly inclusive experience.
+                </CardDescription>
+              </CardContent>
+              <div className="p-6 pt-0">
+                <Button variant="outline" className="w-full text-primary-500 hover:bg-primary-50">
+                  Supported Languages
+                </Button>
+              </div>
+            </Card>
+          </motion.div>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] dark:before:bg-gradient-radial dark:before:from-black dark:before:to-transparent dark:after:from-sky-800 dark:after:via-blue-800 dark:opacity-50">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and&nbsp;API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>Explore starter templates for your Next.js project.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with&nbsp;Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   )
 }
