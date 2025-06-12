@@ -73,6 +73,21 @@ export default function VerifyPage() {
         setVerificationStatus("approved")
         updateUser({ isVerified: true, isStudent: formData.isStudent })
 
+        // Claim verification tokens
+        if (user?.id) {
+          await fetch("/api/tokens/claim", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: user.id, rewardType: "verify-student", amount: 100 }), // 100 tokens for verification
+          })
+          // Re-fetch user data to update tokens and claimed rewards in context
+          const userRes = await fetch("/api/auth/me")
+          if (userRes.ok) {
+            const userData = await userRes.json()
+            updateUser(userData.user)
+          }
+        }
+
         // Mint NFT if student
         if (formData.isStudent) {
           await mintStudentNFT()
