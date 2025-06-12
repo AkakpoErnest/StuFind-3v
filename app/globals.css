@@ -2,85 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
+/* Custom Fonts (Example - you might need to import these via @font-face or Google Fonts) */
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'); */
+/* body { font-family: 'Poppins', sans-serif; } */
 
 @layer base {
   :root {
+    /* Primary Blue Palette (Vibrant, Deep Blue) */
+    --primary-50: 217 91% 95%;
+    --primary-100: 217 91% 90%;
+    --primary-200: 217 91% 80%;
+    --primary-300: 217 91% 70%;
+    --primary-400: 217 91% 50%;
+    --primary-500: 217 91% 40%; /* Main Brand Blue */
+    --primary-600: 217 91% 30%;
+    --primary-700: 217 91% 20%;
+    --primary-800: 217 91% 15%;
+    --primary-900: 217 91% 10%;
+
+    /* Accent Yellow/Orange for Tokens */
+    --accent-yellow-50: 40 95% 95%;
+    --accent-yellow-500: 40 95% 60%; /* Main Accent Yellow */
+    --accent-yellow-700: 40 95% 40%;
+
+    /* Base Colors (Light Mode) */
     --background: 0 0% 100%;
-    --foreground: 215 25% 27%;
+    --foreground: 215 25% 20%; /* Darker text for contrast */
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card-foreground: 215 25% 20%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
-    --primary: 217 91% 60%; /* Deep Blue */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 214 32% 91%;
-    --secondary-foreground: 215 25% 27%;
-    --muted: 214 32% 91%;
+    --popover-foreground: 215 25% 20%;
+
+    --primary: var(--primary-500);
+    --primary-foreground: 0 0% 98%; /* White text on primary */
+
+    --secondary: var(--primary-100);
+    --secondary-foreground: var(--primary-700);
+
+    --muted: var(--primary-50);
     --muted-foreground: 215 16% 47%;
-    --accent: 214 32% 91%;
-    --accent-foreground: 215 25% 27%;
+
+    --accent: var(--primary-100);
+    --accent-foreground: var(--primary-700);
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 60%;
-    --chart-1: 217 91% 60%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 215 25% 27%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 214 32% 91%;
-    --sidebar-accent-foreground: 215 25% 27%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 217 91% 60%;
+
+    --border: var(--primary-200);
+    --input: var(--primary-100);
+    --ring: var(--primary-500);
+
+    --radius: 0.75rem; /* Slightly more rounded corners */
   }
+
   .dark {
-    --background: 215 28% 17%;
+    /* Primary Blue Palette (Dark Mode) */
+    --primary-50: 217 91% 10%;
+    --primary-100: 217 91% 15%;
+    --primary-200: 217 91% 20%;
+    --primary-300: 217 91% 30%;
+    --primary-400: 217 91% 40%;
+    --primary-500: 217 91% 50%; /* Main Brand Blue */
+    --primary-600: 217 91% 60%;
+    --primary-700: 217 91% 70%;
+    --primary-800: 217 91% 80%;
+    --primary-900: 217 91% 90%;
+
+    /* Accent Yellow/Orange for Tokens */
+    --accent-yellow-50: 40 95% 10%;
+    --accent-yellow-500: 40 95% 60%; /* Main Accent Yellow */
+    --accent-yellow-700: 40 95% 80%;
+
+    /* Base Colors (Dark Mode) */
+    --background: 215 28% 12%; /* Darker background */
     --foreground: 213 31% 91%;
     --card: 215 28% 17%;
     --card-foreground: 213 31% 91%;
     --popover: 215 28% 17%;
     --popover-foreground: 213 31% 91%;
-    --primary: 217 91% 60%; /* Deep Blue */
+
+    --primary: var(--primary-500);
     --primary-foreground: 215 28% 17%;
+
     --secondary: 215 28% 25%;
     --secondary-foreground: 213 31% 91%;
-    --muted: 215 28% 25%;
+
+    --muted: 215 28% 20%;
     --muted-foreground: 215 20% 65%;
+
     --accent: 215 28% 25%;
     --accent-foreground: 213 31% 91%;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 213 31% 91%;
+
     --border: 215 28% 25%;
     --input: 215 28% 25%;
-    --ring: 217 91% 60%;
-    --chart-1: 217 91% 60%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 215 28% 17%;
-    --sidebar-foreground: 213 31% 91%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 215 28% 17%;
-    --sidebar-accent: 215 28% 25%;
-    --sidebar-accent-foreground: 213 31% 91%;
-    --sidebar-border: 215 28% 25%;
-    --sidebar-ring: 217 91% 60%;
+    --ring: var(--primary-500);
   }
 }
 
@@ -93,12 +111,12 @@ body {
   }
 }
 
-/* Smooth page transitions */
+/* Smooth transitions for all elements */
 * {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow,
     transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+  transition-duration: 200ms; /* Slightly longer for smoother feel */
 }
 
 /* Smooth scrolling */
@@ -106,60 +124,64 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Page transition animations */
-.page-transition-enter {
-  opacity: 0;
-  transform: translateY(20px);
-}
+/* Page transition animations (using Next.js App Router's default behavior with motion components) */
+/* No specific CSS classes needed here if using framer-motion directly on components */
 
-.page-transition-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms ease-out, transform 300ms ease-out;
-}
-
-.page-transition-exit {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.page-transition-exit-active {
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: opacity 300ms ease-in, transform 300ms ease-in;
-}
-
-/* Smooth hover effects */
-.hover-lift {
+/* Enhanced Hover Effects */
+.hover-scale-105 {
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
+.hover-scale-105:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(var(--primary-500-rgb), 0.2); /* Dynamic shadow color */
+}
 
-.hover-lift:hover {
+.hover-lift-shadow {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.hover-lift-shadow:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(var(--primary-500-rgb), 0.15);
+}
+
+/* Custom Gradients */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, hsl(var(--primary-500)) 0%, hsl(var(--primary-700)) 100%);
+}
+.bg-gradient-accent-yellow {
+  background: linear-gradient(135deg, hsl(var(--accent-yellow-500)) 0%, hsl(var(--accent-yellow-700)) 100%);
+}
+
+/* Utility for dynamic RGB values for shadows */
+:root {
+  --primary-500-rgb: 33, 102, 204; /* Example RGB for primary-500 */
+}
+.dark {
+  --primary-500-rgb: 59, 130, 246; /* Example RGB for dark mode primary-500 */
+}
+
+/* Custom Card Styles */
+.card-v21 {
+  @apply bg-card border border-border rounded-xl shadow-lg overflow-hidden;
+  transition: all 0.3s ease-in-out;
+}
+.card-v21:hover {
+  @apply shadow-xl;
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
 }
 
-/* Loading animations */
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
+/* Custom Button Styles */
+.btn-v21-primary {
+  @apply bg-gradient-primary text-primary-foreground font-semibold py-2 px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-200;
+}
+.btn-v21-outline {
+  /* Now that primary-500 is defined in tailwind.config.ts, these classes will work */
+  @apply border border-primary-500 text-primary-500 bg-transparent font-semibold py-2 px-6 rounded-full hover:bg-primary-50 transition-all duration-200;
 }
 
-.shimmer {
-  background: linear-gradient(90deg, #dbeafe 25%, #bfdbfe 50%, #dbeafe 75%);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* Blue gradient backgrounds */
-.bg-blue-gradient {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-}
-
-.bg-blue-gradient-light {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

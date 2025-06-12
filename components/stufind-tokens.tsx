@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { useAuth } from "@/components/auth/auth-provider"
+import { motion } from "framer-motion"
 
 interface TokenReward {
   id: string
@@ -157,138 +158,173 @@ export function StufindTokens() {
   const dailyClaimAmount = dailyReward.tokens + dailyStreak * 2
 
   return (
-    <div className="space-y-4 p-4 md:p-6">
+    <div className="space-y-6 p-4 md:p-8 bg-gradient-to-br from-primary-50 to-background min-h-screen">
       {/* Token Balance */}
-      <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950 dark:to-orange-950 border-yellow-200">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <Coins className="h-6 w-6 text-white" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <Card className="card-v21 bg-gradient-to-r from-accent-yellow-500 to-accent-yellow-700 text-white shadow-lg hover-lift-shadow">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shadow-inner">
+                <Coins className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">{tokens.toLocaleString()}</h3>
-                <p className="text-sm text-yellow-600 dark:text-yellow-400">StuFind Tokens</p>
+                <h3 className="text-3xl font-bold drop-shadow-sm">{tokens.toLocaleString()}</h3>
+                <p className="text-sm opacity-90">StuFind Tokens</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-muted-foreground">Daily Streak</div>
-              <div className="text-xl font-bold text-orange-600">{dailyStreak} days</div>
+              <div className="text-sm opacity-90">Daily Streak</div>
+              <div className="text-2xl font-bold">{dailyStreak} days</div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Daily Claim */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Gift className="h-5 w-5" />
-            Daily Rewards
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Daily Token Claim</p>
-              <p className="text-sm text-muted-foreground">
-                Base: {dailyReward.tokens} tokens + {dailyStreak * 2} streak bonus
-              </p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <Card className="card-v21">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-primary-700">
+              <Gift className="h-6 w-6" />
+              Daily Rewards
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <p className="font-semibold text-lg">Daily Token Claim</p>
+                <p className="text-sm text-muted-foreground">
+                  Base: {dailyReward.tokens} tokens + {dailyStreak * 2} streak bonus
+                </p>
+              </div>
+              <div className="text-center sm:text-right">
+                {canClaimDaily ? (
+                  <Button
+                    onClick={() => handleClaim("daily", dailyClaimAmount)}
+                    className="btn-v21-primary"
+                    disabled={!isAuthenticated}
+                  >
+                    <Coins className="h-4 w-4 mr-2" />
+                    Claim {dailyClaimAmount}
+                  </Button>
+                ) : (
+                  <div>
+                    <div className="text-sm text-muted-foreground">Next claim in:</div>
+                    <div className="font-mono text-xl font-bold text-primary-600">
+                      {formatTime(nextDailyClaimTime - Date.now())}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="text-right">
-              {canClaimDaily ? (
-                <Button
-                  onClick={() => handleClaim("daily", dailyClaimAmount)}
-                  className="bg-gradient-to-r from-green-500 to-blue-600"
-                >
-                  <Coins className="h-4 w-4 mr-2" />
-                  Claim {dailyClaimAmount}
-                </Button>
-              ) : (
-                <div>
-                  <div className="text-sm text-muted-foreground">Next claim in:</div>
-                  <div className="font-mono text-lg">{formatTime(nextDailyClaimTime - Date.now())}</div>
-                </div>
-              )}
-            </div>
-          </div>
-          <Progress value={((Date.now() - (nextDailyClaimTime - 86400000)) / 86400000) * 100} className="h-2" />
-        </CardContent>
-      </Card>
+            <Progress
+              value={((Date.now() - (nextDailyClaimTime - 86400000)) / 86400000) * 100}
+              className="h-2 bg-primary-100"
+              indicatorClassName="bg-gradient-to-r from-primary-400 to-primary-600"
+            />
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* One-Time Reward Tasks */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Earn More Tokens (One-Time Rewards)</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {rewards
-            .filter((r) => r.id !== "daily") // Filter out daily reward
-            .map((reward) => (
-              <div
-                key={reward.id}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  reward.claimed
-                    ? "bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-700"
-                    : "bg-muted/50"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      reward.claimed ? "bg-green-500 text-white" : "bg-muted"
-                    }`}
-                  >
-                    {reward.icon}
-                  </div>
-                  <div>
-                    <p className="font-medium">{reward.action}</p>
-                    <p className="text-sm text-muted-foreground">{reward.description}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-yellow-600">+{reward.tokens}</div>
-                  {reward.claimed ? (
-                    <Badge className="bg-green-500">Claimed</Badge>
-                  ) : (
-                    <Button
-                      size="sm"
-                      onClick={() => handleClaim(reward.id, reward.tokens)}
-                      disabled={!isAuthenticated || claimedRewards.includes(reward.id)}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <Card className="card-v21">
+          <CardHeader>
+            <CardTitle className="text-primary-700">Earn More Tokens (One-Time Rewards)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {rewards
+              .filter((r) => r.id !== "daily") // Filter out daily reward
+              .map((reward) => (
+                <motion.div
+                  key={reward.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.05 }}
+                  className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg border ${
+                    reward.claimed
+                      ? "bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-700"
+                      : "bg-primary-50 border-primary-100"
+                  } hover-lift-shadow`}
+                >
+                  <div className="flex items-center gap-3 mb-2 sm:mb-0">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${
+                        reward.claimed ? "bg-green-500 text-white" : "bg-primary-200 text-primary-700"
+                      }`}
                     >
-                      Claim
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-        </CardContent>
-      </Card>
+                      {reward.icon}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-base">{reward.action}</p>
+                      <p className="text-sm text-muted-foreground">{reward.description}</p>
+                    </div>
+                  </div>
+                  <div className="text-right flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                    <div className="font-bold text-lg text-accent-yellow-700">+{reward.tokens}</div>
+                    {reward.claimed ? (
+                      <Badge className="bg-green-500 text-white">Claimed</Badge>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() => handleClaim(reward.id, reward.tokens)}
+                        disabled={!isAuthenticated || claimedRewards.includes(reward.id)}
+                        className="btn-v21-primary"
+                      >
+                        Claim
+                      </Button>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Token Uses */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Use Your Tokens</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <Zap className="h-6 w-6 text-blue-500" />
-              <div className="text-center">
-                <div className="font-medium">Boost Listing</div>
-                <div className="text-sm text-muted-foreground">50 tokens</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <Gift className="h-6 w-6 text-purple-500" />
-              <div className="text-center">
-                <div className="font-medium">Premium Features</div>
-                <div className="text-sm text-muted-foreground">100 tokens</div>
-              </div>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <Card className="card-v21">
+          <CardHeader>
+            <CardTitle className="text-primary-700">Use Your Tokens</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Button
+                variant="outline"
+                className="btn-v21-outline h-auto p-4 flex flex-col items-center gap-2 hover-lift-shadow"
+              >
+                <Zap className="h-8 w-8 text-blue-500" />
+                <div className="text-center">
+                  <div className="font-medium text-base">Boost Listing</div>
+                  <div className="text-sm text-muted-foreground">50 tokens</div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="btn-v21-outline h-auto p-4 flex flex-col items-center gap-2 hover-lift-shadow"
+              >
+                <Gift className="h-8 w-8 text-purple-500" />
+                <div className="text-center">
+                  <div className="font-medium text-base">Premium Features</div>
+                  <div className="text-sm text-muted-foreground">100 tokens</div>
+                </div>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   )
 }
