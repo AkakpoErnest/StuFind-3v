@@ -53,11 +53,6 @@ export default function WalletPage() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Connect Your Wallet</h2>
-            <p className="text-muted-foreground">Connect your Ethereum wallet to start buying and selling on StuFind</p>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Wallet Connection */}
             <div className="space-y-6">
